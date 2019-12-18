@@ -4,25 +4,47 @@
 #include <mmdeviceapi.h>
 #include <audiopolicy.h>
 #include <QList>
-#include "model/session.h"
 #include "utils/SafeRelease.h"
 #include "utils/makros.h"
+#include "model/outputdevice.h"
 
 
-class AudioManager {
+class AudioManager: public QObject, IMMNotificationClient {
+    Q_OBJECT
+
 
 public:
-    AudioManager ();
-    ~AudioManager ();
-    HRESULT getStatus ();
-    HRESULT addSession (IAudioSessionControl*);
+    AudioManager(QObject* = nullptr);
+    ~AudioManager();
+    HRESULT getInternalStatus();
+
+    // For IMMNotificationClient
+    HRESULT __stdcall OnDefaultDeviceChanged(EDataFlow, ERole, LPCWSTR) override;
+    HRESULT __stdcall OnDeviceAdded(LPCWSTR) override;
+    HRESULT __stdcall OnDeviceRemoved(LPCWSTR) override;
+    HRESULT __stdcall OnDeviceStateChanged(LPCWSTR, DWORD) override;
+    HRESULT __stdcall OnPropertyValueChanged(LPCWSTR, const PROPERTYKEY) override;
+    // I trust Windows enough not to make weird errors, so just simply ignore methods
+    ULONG __stdcall AddRef() override;
+    ULONG __stdcall Release() override;
+    HRESULT __stdcall QueryInterface(REFIID, void**) override;
 
 
 private:
-    HRESULT status = S_OK;
-    QList<Session*> sessions;
+    bool disableSignalling = false;
+    HRESULT hr = S_OK;
 
+    // pointers
+    IMMDeviceEnumerator *pDeviceEnumerator = nullptr;
+
+    // properties
+    QList<OutputDevice*> outputDevices;
+
+    // methods
     HRESULT init();
+    bool findOutputDevice(LPCWSTR, OutputDevice**);
+    bool findDefaultOutputDevice(OutputDevice**);
+
 
 };
 

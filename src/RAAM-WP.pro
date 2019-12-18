@@ -17,14 +17,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     main.cpp \
+    model/outputdevice.cpp \
     view/mainwindow.cpp \
-    model/audiomanager.cpp \
-    model/session.cpp
+    model/audiomanager.cpp
 
 HEADERS += \
+    model/outputdevice.h \
     view/mainwindow.h \
     model/audiomanager.h \
-    model/session.h \
     utils/SafeRelease.h \
     utils/makros.h
 
@@ -32,8 +32,9 @@ FORMS += \
     view/mainwindow.ui
 
 LIBS += \
-    "$$PWD\..\libs\Ole32.Lib"
-    "$$PWD\..\libs\mmdevapi.lib"
+    "$$PWD\..\libs\Ole32.Lib" \
+    "$$PWD\..\libs\mmdevapi.lib" \
+    "$$PWD\..\libs\Uuid.Lib"
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

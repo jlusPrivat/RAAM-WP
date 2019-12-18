@@ -1,63 +1,141 @@
 #include "audiomanager.h"
 
 
-AudioManager::AudioManager () {
-    status = this->init();
+
+AudioManager::AudioManager (QObject *parent)
+    : QObject(parent) {
+    CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    this->init();
 }
 
 
 
 AudioManager::~AudioManager () {
-    // delete all active sessions
-    int size = sessions.size();
-    for (int i = 0; i < size; i++)
-        delete(sessions.at(i));
+    pDeviceEnumerator->UnregisterEndpointNotificationCallback(this);
+    SafeRelease(&pDeviceEnumerator);
+    CoUninitialize();
 }
 
 
 
-HRESULT AudioManager::getStatus () {
-    return status;
-}
-
-
-
-HRESULT AudioManager::addSession (IAudioSessionControl *pSessControl) {
-    HRESULT hr = S_OK;
-
-    // initialize needed vars
-    IAudioSessionControl2 *pSessControl2 = nullptr;
-    ISimpleAudioVolume *pSimpleAudioVol = nullptr;
-
-    // get the AudioSessionControl2
-    hr = pSessControl->QueryInterface(
-                __uuidof(IAudioSessionControl2),
-                reinterpret_cast<void**>(&pSessControl2));
-    FAILCATCH;
-
-    // get the SimpleAudioVolume
-    hr = pSessControl2->QueryInterface(
-                __uuidof(ISimpleAudioVolume),
-                reinterpret_cast<void**>(&pSimpleAudioVol));
-
-done:
-    SafeRelease(&pSessControl2);
-    SafeRelease(&pSimpleAudioVol);
+HRESULT AudioManager::getInternalStatus () {
     return hr;
 }
 
 
 
-HRESULT AudioManager::init () {
-    HRESULT hr = S_OK;
+HRESULT __stdcall AudioManager::OnDefaultDeviceChanged (EDataFlow flow,
+                                              ERole role, LPCWSTR deviceId) {
+    // only use incoming data from console and ignore other default outputs
+    if (flow == eRender && role == eConsole) {
+        // reset old default OutputDevice to non default
+        OutputDevice *device = nullptr;
+        if (findDefaultOutputDevice(&device))
+            device->setIsDefaultOutput(false);
+        // set new default OutputDevice, if provided
+        if (deviceId) {
+            device = nullptr;
+            if (findOutputDevice(deviceId, &device))
+                device->setIsDefaultOutput(true);
+        }
+    }
+    return S_OK;
+}
 
+
+
+HRESULT __stdcall AudioManager::OnDeviceAdded (LPCWSTR deviceId) {
+    IMMDevice *pNewMMDevice = nullptr;
+    OutputDevice *pNewOutputDevice = nullptr;
+
+    // find new device, create object
+    hr = pDeviceEnumerator->GetDevice(deviceId, &pNewMMDevice);
+    FAILCATCH;
+    pNewOutputDevice = new OutputDevice(pNewMMDevice, this);
+
+    // check object integrity and insert into list
+    hr = pNewOutputDevice->getInternalStatus();
+    FAILCATCH_DELETE(pNewOutputDevice);
+    outputDevices.append(pNewOutputDevice);
+
+done:
+    SafeRelease(&pNewMMDevice);
+    return S_OK;
+}
+
+
+
+HRESULT __stdcall AudioManager::OnDeviceRemoved (LPCWSTR deviceId) {
+    OutputDevice *pOutputDevice = nullptr;
+    if (findOutputDevice(deviceId, &pOutputDevice)) {
+        delete(pOutputDevice);
+        outputDevices.removeAll(pOutputDevice);
+    }
+    return S_OK;
+}
+
+
+
+HRESULT __stdcall AudioManager::OnDeviceStateChanged (LPCWSTR deviceId, DWORD newState) {
+    // only update, if new state is active or unplugged
+    if (newState & (DEVICE_STATE_ACTIVE | DEVICE_STATE_UNPLUGGED)) {
+        OutputDevice *device = nullptr;
+        // update available device
+        if (findOutputDevice(deviceId, &device))
+            device->setState(newState);
+        // create new device
+        else
+            OnDeviceAdded(deviceId);
+    }
+    // otherwise delete OutputDevice, because it is not present or disabled
+    else
+        OnDeviceRemoved(deviceId);
+    return S_OK;
+}
+
+
+
+HRESULT __stdcall AudioManager::OnPropertyValueChanged (LPCWSTR deviceId,
+                                              const PROPERTYKEY propKey) {
+    OutputDevice *device = nullptr;
+    // update found device
+    if (findOutputDevice(deviceId, &device)) {
+        device->updateProperty(propKey);
+    }
+    // device not found, try recovering from invalid state by adding it
+    else
+        OnDeviceAdded(deviceId);
+    return S_OK;
+}
+
+
+
+ULONG __stdcall AudioManager::AddRef () {
+    return 1;
+}
+
+
+
+ULONG __stdcall AudioManager::Release () {
+    return 0;
+}
+
+
+
+HRESULT __stdcall AudioManager::QueryInterface (REFIID, void** ppvInterface) {
+    *ppvInterface = nullptr;
+    return E_NOINTERFACE;
+}
+
+
+
+HRESULT AudioManager::init () {
     // initialize needed vars
-    IMMDeviceEnumerator *pDeviceEnumerator = nullptr;
-    IMMDevice *pDevice = nullptr;
-    IAudioSessionManager2 *pSessionManager2 = nullptr;
-    IAudioSessionEnumerator *pSessionEnumerator = nullptr;
-    int countSessions;
-    IAudioSessionControl *pSessControl = nullptr;
+    IMMDevice *pDefaultDevice = nullptr;
+    IMMDeviceCollection *pDeviceCollection = nullptr;
+    uint devicesCount = 0;
+    IMMDevice *pCDevice = nullptr;
+    OutputDevice *outputDevice = nullptr;
 
     // get device enumerator
     hr = CoCreateInstance(
@@ -68,39 +146,70 @@ HRESULT AudioManager::init () {
                 );
     FAILCATCH;
 
-    // get the default audio output (for consoles)
-    // !!! only for consoles? (games, system, etc.), no  music, video
-    pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &pDevice);
+    // get the pointer for default audio output (for consoles)
+    hr = pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &pDefaultDevice);
     FAILCATCH;
 
-    // get the session manager2
-    hr = pDevice->Activate(
-                __uuidof(IAudioSessionManager2),
-                CLSCTX_ALL,
-                nullptr,
-                reinterpret_cast<void**>(&pSessionManager2));
+    // get all devices and create instances for them
+    // only instances, that are either active or unplugged
+    // => no deactivated or unavailable interfaces
+    hr = pDeviceEnumerator->EnumAudioEndpoints(
+                eRender,
+                DEVICE_STATE_ACTIVE | DEVICE_STATE_UNPLUGGED,
+                &pDeviceCollection);
     FAILCATCH;
-
-    // iterate over all sessions
-    hr = pSessionManager2->GetSessionEnumerator(&pSessionEnumerator);
+    hr = pDeviceCollection->GetCount(&devicesCount);
     FAILCATCH;
-    hr = pSessionEnumerator->GetCount(&countSessions);
-    FAILCATCH;
-    for (int i = 0; i < countSessions; i++) {
-        // get the AudioSessionControl
-        SafeRelease(&pSessControl);
-        hr = pSessionEnumerator->GetSession(i, &pSessControl);
+    for (uint i = 0; i < devicesCount; i++) {
+        // get device and create instance; check, if it is the default output
+        // then release the IMMDevice again, as it is being hold by the newly
+        // created instance
+        hr = pDeviceCollection->Item(i, &pCDevice);
         FAILCATCH;
+        outputDevice = new OutputDevice(pCDevice, this);
+        bool isDefaultOutput = (pCDevice == pDefaultDevice);
+        SafeRelease(&pCDevice);
+        hr = outputDevice->getInternalStatus();
+        FAILCATCH_DELETE(outputDevice);
 
-        // create new session
-        addSession(pSessControl);
+        // insert instance to list and set isDefaultOutput property
+        outputDevices.append(outputDevice);
+        outputDevice->setIsDefaultOutput(isDefaultOutput);
     }
 
+    // register itself as MMNotificationClient
+    pDeviceEnumerator->RegisterEndpointNotificationCallback(this);
+
 done:
-    SafeRelease(&pDeviceEnumerator);
-    SafeRelease(&pDevice);
-    SafeRelease(&pSessionManager2);
-    SafeRelease(&pSessionEnumerator);
-    SafeRelease(&pSessControl);
+    SafeRelease(&pDefaultDevice);
+    SafeRelease(&pDeviceCollection);
     return hr;
+}
+
+
+
+bool AudioManager::findOutputDevice (LPCWSTR endpointId, OutputDevice **ppOutputDevice) {
+    uint count = outputDevices.count();
+    for (uint i = 0; i < count; i++) {
+        OutputDevice *ce = outputDevices.at(i);
+        if (ce->compareEndpointId(endpointId)) {
+            *ppOutputDevice = ce;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+bool AudioManager::findDefaultOutputDevice (OutputDevice **ppOutputDevice) {
+    uint count = outputDevices.count();
+    for (uint i = 0; i < count; i++) {
+        OutputDevice *ce = outputDevices.at(i);
+        if (ce->getIsDefaultOutput()) {
+            *ppOutputDevice = ce;
+            return true;
+        }
+    }
+    return false;
 }
