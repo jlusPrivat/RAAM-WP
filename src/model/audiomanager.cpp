@@ -132,6 +132,7 @@ HRESULT __stdcall AudioManager::QueryInterface (REFIID, void** ppvInterface) {
 HRESULT AudioManager::init () {
     // initialize needed vars
     IMMDevice *pDefaultDevice = nullptr;
+    LPWSTR pDefaultDeviceId = nullptr;
     IMMDeviceCollection *pDeviceCollection = nullptr;
     uint devicesCount = 0;
     IMMDevice *pCDevice = nullptr;
@@ -144,10 +145,6 @@ HRESULT AudioManager::init () {
                 CLSCTX_ALL,
                 IID_PPV_ARGS(&pDeviceEnumerator)
                 );
-    FAILCATCH;
-
-    // get the pointer for default audio output (for consoles)
-    hr = pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &pDefaultDevice);
     FAILCATCH;
 
     // get all devices and create instances for them
@@ -167,15 +164,24 @@ HRESULT AudioManager::init () {
         hr = pDeviceCollection->Item(i, &pCDevice);
         FAILCATCH;
         outputDevice = new OutputDevice(pCDevice, this);
-        bool isDefaultOutput = (pCDevice == pDefaultDevice);
         SafeRelease(&pCDevice);
         hr = outputDevice->getInternalStatus();
         FAILCATCH_DELETE(outputDevice);
 
         // insert instance to list and set isDefaultOutput property
         outputDevices.append(outputDevice);
-        outputDevice->setIsDefaultOutput(isDefaultOutput);
     }
+
+    // get the default audio output (for consoles) and its Id
+    hr = pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &pDefaultDevice);
+    FAILCATCH;
+    hr = pDefaultDevice->GetId(&pDefaultDeviceId);
+    FAILCATCH;
+
+    // find the default device and set it as standard
+    outputDevice = nullptr;
+    if (findOutputDevice(pDefaultDeviceId, &outputDevice))
+        outputDevice->setIsDefaultOutput(true);
 
     // register itself as MMNotificationClient
     pDeviceEnumerator->RegisterEndpointNotificationCallback(this);
@@ -183,6 +189,8 @@ HRESULT AudioManager::init () {
 done:
     SafeRelease(&pDefaultDevice);
     SafeRelease(&pDeviceCollection);
+    if (pDefaultDeviceId)
+        CoTaskMemFree(pDefaultDeviceId);
     return hr;
 }
 

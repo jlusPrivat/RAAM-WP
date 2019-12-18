@@ -2,7 +2,6 @@
 #define AUDIOMANAGER_H
 
 #include <mmdeviceapi.h>
-#include <audiopolicy.h>
 #include <QList>
 #include "utils/SafeRelease.h"
 #include "utils/makros.h"

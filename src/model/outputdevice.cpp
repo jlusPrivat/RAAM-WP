@@ -2,9 +2,9 @@
 
 
 
-OutputDevice::OutputDevice (IMMDevice *pMMDevice, QObject *parent)
+OutputDevice::OutputDevice (IMMDevice *pDevice, QObject *parent)
     : QObject(parent) {
-    this->pMMDevice = pMMDevice;
+    pMMDevice = pDevice;
     pMMDevice->AddRef();
     init();
 }
@@ -15,7 +15,7 @@ OutputDevice::~OutputDevice () {
     SafeRelease(&pMMDevice);
     SafeRelease(&pPropertyStore);
     if (pEndpointId)
-        CoTaskMemFree(&pEndpointId);
+        CoTaskMemFree(pEndpointId);
 }
 
 
@@ -72,7 +72,7 @@ void OutputDevice::updateProperty (const PROPERTYKEY propKey) {
 
 HRESULT OutputDevice::init () {
     // get the endpointID
-    //hr = pMMDevice->GetId(&pEndpointId); !!!
+    hr = pMMDevice->GetId(&pEndpointId);
     FAILCATCH;
 
     // get the device state
@@ -112,7 +112,7 @@ HRESULT OutputDevice::updateDescriptionLong () {
     hr = pPropertyStore->GetValue(PKEY_Device_FriendlyName, &propvariant);
     FAILCATCH;
     if (propvariant.vt == VT_LPWSTR && descriptionLong != (*propvariant.pwszVal))
-        descriptionLong = *propvariant.pwszVal;
+        descriptionLong = QString::fromWCharArray(propvariant.pwszVal);
 
 done:
     PropVariantClear(&propvariant);
@@ -131,7 +131,7 @@ HRESULT OutputDevice::updateDescriptionShort () {
     hr = pPropertyStore->GetValue(PKEY_Device_DeviceDesc, &propvariant);
     FAILCATCH;
     if (propvariant.vt == VT_LPWSTR && descriptionShort != (*propvariant.pwszVal))
-        descriptionShort = *propvariant.pwszVal;
+        descriptionShort = QString::fromWCharArray(propvariant.pwszVal);
 
 done:
     PropVariantClear(&propvariant);
@@ -145,7 +145,7 @@ done:
 
 
 HRESULT OutputDevice::updateFormFactor () {
-    /* Not working, see Github issue
+    /* Not working, see Github issue https://github.com/jlusPrivat/RAAM-WP/issues/1
     PROPVARIANT propvariant;
     PropVariantInit(&propvariant);
     EndpointFormFactor newFormFactor;
@@ -170,7 +170,7 @@ done:
 
 
 HRESULT OutputDevice::updateControlPanelPageProvider () {
-    /* Not working, see Github issue
+    /* Not working, see Github issue https://github.com/jlusPrivat/RAAM-WP/issues/1
     PROPVARIANT propvariant;
     PropVariantInit(&propvariant);
     CLSID newCPPP = CLSID_NULL;
