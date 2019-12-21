@@ -3,9 +3,12 @@
 
 #include <QScrollArea>
 #include <QFormLayout>
-#include <QVBoxLayout>
 #include <QLabel>
 #include <QCheckBox>
+#include <QRadioButton>
+#include <QSpinBox>
+#include <QComboBox>
+#include <QPushButton>
 
 
 
@@ -19,6 +22,13 @@ public:
 
 private:
     QCheckBox *keepInTray = new QCheckBox(this);
+    QRadioButton *autostartFull = new QRadioButton(this);
+    QRadioButton *autostartTray = new QRadioButton(this);
+    QRadioButton *autostartNone = new QRadioButton(this);
+    QSpinBox *port = new QSpinBox(this);
+    QComboBox *language = new QComboBox(this);
+    QCheckBox *startupUpdateCheck = new QCheckBox(this);
+
 
 };
 

@@ -4,8 +4,8 @@
 <context>
     <name>About</name>
     <message>
-        <source>&lt;b&gt;Remote Application Audio Program&lt;/b&gt; (RAAM-WP), developed by &lt;a href=&quot;https://jlus.de&quot;&gt;Jonathan Lusky&lt;/a&gt; as &lt;a href=&quot;https://example.org&quot;&gt;bachelor&apos;s thesis&lt;/a&gt;.&lt;br&gt;&lt;br&gt;&lt;b&gt;Overview&lt;/b&gt;&lt;br&gt;RAAM is a collection of softwares that enable users to remotely control audio settings via a network connection. It may be useful for Windows users, who intend to level their games volume with the volume of a communication software without switching to sndvol. RAAM is devided into multiple softwares:&lt;ul&gt;&lt;li&gt;&lt;b&gt;RAAM-WP&lt;/b&gt;: RAAM - Windows Program is the server software, to which a client can connectin order to change the session and device volumes.&lt;/li&gt;&lt;li&gt;&lt;b&gt;RAAM-AA&lt;/b&gt;: RAAM - Android Application is a client software, with which the volumes can be remotely managed.&lt;/li&gt;&lt;/ul&gt;&lt;br&gt;&lt;b&gt;Compatibility&lt;/b&gt;&lt;br&gt;For RAAM-WP: Only Windows 10&lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions&lt;/b&gt;&lt;br&gt;RAAM is licensed under LGPL Version 3. Usage, modification and distribution are permitted. Anyone can contribute to the &lt;a href=&quot;&quot;&gt;GitHub Project&lt;/a&gt; to improve this software.</source>
-        <translation type="unfinished"></translation>
+        <source>&lt;b&gt;Remote Application Audio Program&lt;/b&gt; (RAAM-WP), developed by &lt;a href=&quot;https://jlus.de&quot;&gt;Jonathan Lusky&lt;/a&gt; as &lt;a href=&quot;https://example.org&quot;&gt;bachelor&apos;s thesis&lt;/a&gt;.&lt;br&gt;&lt;br&gt;&lt;b&gt;Version&lt;/b&gt;&lt;br&gt;%1&lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions&lt;/b&gt;&lt;br&gt;RAAM is licensed under LGPL Version 3. Usage, modification and distribution are permitted. Anyone can contribute to the &lt;a href=&quot;&quot;&gt;GitHub Project&lt;/a&gt; to improve this software.</source>
+        <translation>&lt;b&gt;Remote Application Audio Program&lt;/b&gt; (RAAM-WP), entwickelt von &lt;a href=&quot;https://jlus.de&quot;&gt;Jonathan Lusky&lt;/a&gt; im Rahmen seiner &lt;a href=&quot;https://example.org&quot;&gt;Bachelorarbeit&lt;/a&gt;.&lt;br&gt;&lt;br&gt;&lt;b&gt;Version&lt;/b&gt;&lt;br&gt;%1&lt;br&gt;&lt;br&gt;&lt;b&gt;Nutzungsrechte&lt;/b&gt;&lt;br&gt;RAAM ist nach LGPL Version 3 lizenziert. Nutzung, Modifikation und Verteilung sind gestattet. Jeder kann über das &lt;a href=&quot;&quot;&gt;GitHub Projekt&lt;/a&gt; helfen, diese Software zu verbessern.</translation>
     </message>
 </context>
 <context>
@@ -22,12 +22,60 @@
 <context>
     <name>Settings</name>
     <message>
-        <source>Keep this application running in tray, after it was closed</source>
-        <translation type="unfinished"></translation>
+        <source>Keep in tray:</source>
+        <translation>Im Tray behalten:</translation>
     </message>
     <message>
-        <source>Keep in tray:</source>
-        <translation type="unfinished"></translation>
+        <source>Keep this application running in tray when closing it</source>
+        <translation>Diese Anwendung im Hintergrund weiter ausführen, wenn sie geschlossen wird</translation>
+    </message>
+    <message>
+        <source>Autostart:</source>
+        <translation>Autostart:</translation>
+    </message>
+    <message>
+        <source>Start RAAM, when logging in into windows</source>
+        <translation>RAAM starten, wenn Benutzer sich bei Windows anmeldet</translation>
+    </message>
+    <message>
+        <source>Start RAAM in tray, when logging in into windows</source>
+        <translation>RAAM im Hintergrund starten, wenn Benutzer sich bei Windows anmeldet</translation>
+    </message>
+    <message>
+        <source>Do not start RAAM with windows</source>
+        <translation>RAAM nicht automatisch starten</translation>
+    </message>
+    <message>
+        <source>Network port:</source>
+        <translation>Netzwerkport:</translation>
+    </message>
+    <message>
+        <source>Language:</source>
+        <translation>Sprache:</translation>
+    </message>
+    <message>
+        <source>Update check:</source>
+        <translation>Updatekontrolle:</translation>
+    </message>
+    <message>
+        <source>Check for updates, when the application starts</source>
+        <translation>Auf Updates prüfen, wenn RAAM gestartet wird</translation>
+    </message>
+    <message>
+        <source>Check for updates now</source>
+        <translation>Jetzt auf Updates prüfen</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Speichern</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Zurücksetzen</translation>
+    </message>
+    <message>
+        <source>Close application</source>
+        <translation>Anwendung schließen</translation>
     </message>
 </context>
 </TS>
