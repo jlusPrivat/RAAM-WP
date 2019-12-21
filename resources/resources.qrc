@@ -1,0 +1,7 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+	<file>translations/raam-wp_de.qm</file>
+	<file>translations/raam-wp_en.qm</file>
+    <file>imgs/logo.png</file>
+</qresource>
+</RCC>

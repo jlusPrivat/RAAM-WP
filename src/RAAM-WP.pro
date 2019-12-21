@@ -18,23 +18,33 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     model/outputdevice.cpp \
+    view/about.cpp \
     view/mainwindow.cpp \
-    model/audiomanager.cpp
+    model/audiomanager.cpp \
+    view/settings.cpp
 
 HEADERS += \
     model/outputdevice.h \
+    view/about.h \
     view/mainwindow.h \
     model/audiomanager.h \
     utils/SafeRelease.h \
-    utils/makros.h
-
-FORMS += \
-    view/mainwindow.ui
+    utils/makros.h \
+    view/settings.h
 
 LIBS += \
     "$$PWD\..\libs\Ole32.Lib" \
     "$$PWD\..\libs\mmdevapi.lib" \
     "$$PWD\..\libs\Uuid.Lib"
+
+RESOURCES += \
+    "$$PWD\..\resources\resources.qrc"
+
+TRANSLATIONS += \
+    "$$PWD\..\resources\translations\raam-wp_en.ts" \
+    "$$PWD\..\resources\translations\raam-wp_de.ts"
+
+RC_ICONS = "$$PWD\..\resources\imgs\logo.ico"
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
