@@ -18,6 +18,22 @@
         <source>About</source>
         <translation>About</translation>
     </message>
+    <message>
+        <source>Restart RAAM?</source>
+        <translation>Restart RAAM?</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Yes</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>No</translation>
+    </message>
+    <message>
+        <source>You have changed settings that require a restart to take effect. Do you want to restart now?</source>
+        <translation>You have changed settings that require a restart to take effect. Do you want to restart now?</translation>
+    </message>
 </context>
 <context>
     <name>Settings</name>

@@ -39,8 +39,15 @@ Settings::Settings (QWidget *parent)
     layout->addRow(tr("Network port:"), port);
 
     // language
-    language->addItem(QIcon(":/imgs/flag-de.png"), "Deutsch");
-    language->addItem(QIcon(":/imgs/flag-uk.png"), "English");
+    auto langs = Language::languages;
+    const int numEntries = langs.count();
+    for (int i = 0; i < numEntries; i++) {
+        Language *lang = langs.at(i);
+        language->addItem(QIcon(":/imgs/flag-" + lang->nameShort + ".png"),
+                          lang->nameFull, lang->nameShort);
+        if (lang->isSelected)
+            language->setCurrentIndex(i);
+    }
     language->setFixedWidth(300);
     layout->addRow(tr("Language:"), language);
 
@@ -59,6 +66,8 @@ Settings::Settings (QWidget *parent)
     // buttons at the end
     QHBoxLayout *lButtons = new QHBoxLayout;
     QPushButton *buttonSave = new QPushButton(tr("Save"), wForm);
+    QObject::connect(buttonSave, &QPushButton::clicked,
+                     this, &Settings::settingsUpdated);
     buttonSave->setStyleSheet("font-weight: bold;");
     lButtons->addWidget(buttonSave);
     QPushButton *buttonReset = new QPushButton(tr("Reset"), wForm);

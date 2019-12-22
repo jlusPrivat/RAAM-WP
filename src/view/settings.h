@@ -9,6 +9,7 @@
 #include <QSpinBox>
 #include <QComboBox>
 #include <QPushButton>
+#include "controller/language.h"
 
 
 
@@ -18,9 +19,6 @@ class Settings: public QScrollArea {
 
 public:
     Settings(QWidget*);
-
-
-private:
     QCheckBox *keepInTray = new QCheckBox(this);
     QRadioButton *autostartFull = new QRadioButton(this);
     QRadioButton *autostartTray = new QRadioButton(this);
@@ -28,6 +26,10 @@ private:
     QSpinBox *port = new QSpinBox(this);
     QComboBox *language = new QComboBox(this);
     QCheckBox *startupUpdateCheck = new QCheckBox(this);
+
+
+signals:
+    void settingsUpdated();
 
 
 };

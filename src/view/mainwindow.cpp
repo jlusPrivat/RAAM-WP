@@ -18,7 +18,7 @@ MainWindow::MainWindow (QWidget *parent)
     setCentralWidget(centralWidget);
 
     // add the specific tabs
-    tabBar->addTab(new Settings(this), tr("Settings"));
+    tabBar->addTab(settingsTab = new Settings(this), tr("Settings"));
     tabBar->addTab(new About(this), tr("About"));
 
     // add statusbar
@@ -28,5 +28,26 @@ MainWindow::MainWindow (QWidget *parent)
 
 
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow () {
+}
+
+
+
+bool MainWindow::askForRestart () {
+    // configure the message
+    QMessageBox modal(QMessageBox::Question, tr("Restart RAAM?"),
+                      tr("You have changed settings that require a restart to "
+                         "take effect. Do you want to restart now?"),
+                      QMessageBox::NoButton, this);
+    QPushButton *buttonYes = modal.addButton(tr("Yes"), QMessageBox::YesRole);
+    modal.addButton(tr("No"), QMessageBox::NoRole);
+    modal.setDefaultButton(buttonYes);
+
+    // display the message
+    modal.exec();
+
+    // check the result
+    if (modal.clickedButton() == buttonYes)
+        return true;
+    return false;
 }

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QTabWidget>
 #include <QStatusBar>
 #include "view/settings.h"
@@ -14,9 +15,12 @@ class MainWindow: public QMainWindow {
 
 
 public:
+    Settings *settingsTab = nullptr;
+    QStatusBar *statusbar = nullptr;
+
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    QStatusBar *statusbar;
+    bool askForRestart();
 
 
 };

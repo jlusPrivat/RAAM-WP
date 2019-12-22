@@ -18,6 +18,22 @@
         <source>About</source>
         <translation>Über</translation>
     </message>
+    <message>
+        <source>Restart RAAM?</source>
+        <translation>RAAM neu starten?</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nein</translation>
+    </message>
+    <message>
+        <source>You have changed settings that require a restart to take effect. Do you want to restart now?</source>
+        <translation>Damit die Änderungen wirksam werden, muss die Anwendung neu gestartet werden. Jetzt neu starten?</translation>
+    </message>
 </context>
 <context>
     <name>Settings</name>

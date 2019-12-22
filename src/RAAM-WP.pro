@@ -16,6 +16,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    controller/language.cpp \
+    controller/maincontroller.cpp \
     main.cpp \
     model/outputdevice.cpp \
     view/about.cpp \
@@ -24,6 +26,8 @@ SOURCES += \
     view/settings.cpp
 
 HEADERS += \
+    controller/language.h \
+    controller/maincontroller.h \
     model/outputdevice.h \
     view/about.h \
     view/mainwindow.h \
