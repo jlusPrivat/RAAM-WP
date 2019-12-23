@@ -34,6 +34,18 @@
         <source>You have changed settings that require a restart to take effect. Do you want to restart now?</source>
         <translation>Damit die Änderungen wirksam werden, muss die Anwendung neu gestartet werden. Jetzt neu starten?</translation>
     </message>
+    <message>
+        <source>Remote Application Audio Mixer</source>
+        <translation>Remote Application Audio Mixer</translation>
+    </message>
+    <message>
+        <source>Open Application</source>
+        <translation>Anwendung öffnen</translation>
+    </message>
+    <message>
+        <source>Close Application</source>
+        <translation>Anwendung schließen</translation>
+    </message>
 </context>
 <context>
     <name>Settings</name>

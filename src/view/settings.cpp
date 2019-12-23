@@ -76,6 +76,8 @@ Settings::Settings (QWidget *parent)
     lButtons->addWidget(buttonReset);
 
     QPushButton *buttonClose = new QPushButton(tr("Close application"), wForm);
+    QObject::connect(buttonClose, &QPushButton::clicked,
+                     this, [&]{closeRequested(true);});
     buttonClose->setToolTip(tr("Fully close the application (no tray)"));
     buttonClose->setStyleSheet("color: red;");
     lButtons->addWidget(buttonClose);

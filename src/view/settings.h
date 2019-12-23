@@ -29,6 +29,7 @@ public:
 
 
 signals:
+    void closeRequested(bool);
     void settingsUpdated();
     void settingsReset();
 

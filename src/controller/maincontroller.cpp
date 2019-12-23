@@ -19,6 +19,14 @@ MainController::MainController (QObject *parent)
     resetSettings();
 
     // connect the signals with the window
+    QObject::connect(w, &MainWindow::closeRequested,
+                     this, &MainController::parseCloseRequest);
+    QObject::connect(w, &MainWindow::trayOpenApp,
+                     this, &MainController::parseOpenRequest);
+    QObject::connect(w, &MainWindow::trayCloseApp,
+                     this, [&]{parseCloseRequest(true);});
+    QObject::connect(w->settingsTab, &Settings::closeRequested,
+                     this, &MainController::parseCloseRequest);
     QObject::connect(w->settingsTab, &Settings::settingsUpdated,
                      this, &MainController::updateSettings);
     QObject::connect(w->settingsTab, &Settings::settingsReset,
@@ -35,6 +43,29 @@ void MainController::updateLanguageController (QString langShort) {
     for (int i = 0; i < numLangs; i++) {
         Language *lang = Language::languages.at(i);
         lang->isSelected = (langShort == lang->nameShort);
+    }
+}
+
+
+
+void MainController::parseCloseRequest (bool force) {
+    if (force || !qSettings->value("keepintray", true).toBool()) {
+        // fully close application
+        qApp->quit();
+    }
+    else {
+        // just minimize to tray
+        w->trayIcon->show();
+        w->hide();
+    }
+}
+
+
+
+void MainController::parseOpenRequest () {
+    if (!w->isVisible()) {
+        w->show();
+        w->trayIcon->hide();
     }
 }
 

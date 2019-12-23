@@ -30,13 +30,15 @@ public:
 
 private:
     MainWindow *w = nullptr;
-    QTranslator *translator = new QTranslator();
+    QTranslator *translator = new QTranslator(this);
     QSettings *qSettings = nullptr;
 
     void updateLanguageController(QString);
 
 
 private slots:
+    void parseCloseRequest(bool);
+    void parseOpenRequest();
     void updateSettings();
     void resetSettings();
 

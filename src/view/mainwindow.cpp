@@ -21,6 +21,19 @@ MainWindow::MainWindow (QWidget *parent)
     tabBar->addTab(settingsTab = new Settings(this), tr("Settings"));
     tabBar->addTab(new About(this), tr("About"));
 
+    // add tray icon
+    trayIcon = new QSystemTrayIcon(QIcon(":/imgs/tray.ico"), this);
+    trayIcon->setToolTip(tr("Remote Application Audio Mixer"));
+    QMenu *trayMenu = new QMenu(this);
+    trayMenu->addAction(tr("Open Application"), this, &MainWindow::trayOpenApp);
+    trayMenu->addAction(tr("Close Application"), this, &MainWindow::trayCloseApp);
+    trayIcon->setContextMenu(trayMenu);
+    QObject::connect(trayIcon, &QSystemTrayIcon::activated, this,
+                     [&](QSystemTrayIcon::ActivationReason reason){
+                        if (reason == QSystemTrayIcon::Trigger)
+                            trayOpenApp();
+                     });
+
     // add statusbar
     statusbar = new QStatusBar(this);
     this->setStatusBar(statusbar);
@@ -50,4 +63,11 @@ bool MainWindow::askForRestart () {
     if (modal.clickedButton() == buttonYes)
         return true;
     return false;
+}
+
+
+
+void MainWindow::closeEvent (QCloseEvent *event) {
+    closeRequested(false);
+    event->ignore();
 }
