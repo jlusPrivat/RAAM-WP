@@ -93,5 +93,13 @@
         <source>Close application</source>
         <translation>Close application</translation>
     </message>
+    <message>
+        <source>Reset form to abort editing configuration</source>
+        <translation>Reset form to abort editing configuration</translation>
+    </message>
+    <message>
+        <source>Fully close the application (no tray)</source>
+        <translation>Fully close the application (no tray)</translation>
+    </message>
 </context>
 </TS>

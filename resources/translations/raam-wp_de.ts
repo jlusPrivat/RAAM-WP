@@ -93,5 +93,13 @@
         <source>Close application</source>
         <translation>Anwendung schließen</translation>
     </message>
+    <message>
+        <source>Reset form to abort editing configuration</source>
+        <translation>Eingaben zurücksetzen, um Bearbeitung abzubrechen</translation>
+    </message>
+    <message>
+        <source>Fully close the application (no tray)</source>
+        <translation>Die Anwendung vollständig schließen (kein Hintergrund)</translation>
+    </message>
 </context>
 </TS>

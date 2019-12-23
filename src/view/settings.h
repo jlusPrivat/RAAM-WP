@@ -30,6 +30,7 @@ public:
 
 signals:
     void settingsUpdated();
+    void settingsReset();
 
 
 };

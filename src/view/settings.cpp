@@ -34,7 +34,7 @@ Settings::Settings (QWidget *parent)
     lAutostart->addWidget(autostartNone);
 
     // port
-    port->setRange(1025, 65535);
+    port->setRange(1024, 65535);
     port->setFixedWidth(300);
     layout->addRow(tr("Network port:"), port);
 
@@ -45,8 +45,6 @@ Settings::Settings (QWidget *parent)
         Language *lang = langs.at(i);
         language->addItem(QIcon(":/imgs/flag-" + lang->nameShort + ".png"),
                           lang->nameFull, lang->nameShort);
-        if (lang->isSelected)
-            language->setCurrentIndex(i);
     }
     language->setFixedWidth(300);
     layout->addRow(tr("Language:"), language);
@@ -70,9 +68,15 @@ Settings::Settings (QWidget *parent)
                      this, &Settings::settingsUpdated);
     buttonSave->setStyleSheet("font-weight: bold;");
     lButtons->addWidget(buttonSave);
+
     QPushButton *buttonReset = new QPushButton(tr("Reset"), wForm);
+    QObject::connect(buttonReset, &QPushButton::clicked,
+                     this, &Settings::settingsReset);
+    buttonReset->setToolTip(tr("Reset form to abort editing configuration"));
     lButtons->addWidget(buttonReset);
+
     QPushButton *buttonClose = new QPushButton(tr("Close application"), wForm);
+    buttonClose->setToolTip(tr("Fully close the application (no tray)"));
     buttonClose->setStyleSheet("color: red;");
     lButtons->addWidget(buttonClose);
     layout->addRow(lButtons);
