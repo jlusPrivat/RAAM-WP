@@ -84,7 +84,15 @@ void MainController::parseOpenRequest () {
 void MainController::checkForUpdates () {
     QObject::connect(networkManager, &QNetworkAccessManager::finished,
                      this, [&](QNetworkReply* reply) {
+        QNetworkReply::NetworkError error = reply->error();
         QString latestVersion = reply->readAll();
+        reply->deleteLater();
+
+        // check for error
+        if (error != QNetworkReply::NoError) {
+            w->showMessage(tr("There was a network error."), false);
+            return;
+        }
 
         // compare the output
         QStringList latestVersionParts = latestVersion.split(" ").at(0).split(".");
@@ -110,8 +118,6 @@ void MainController::checkForUpdates () {
             w->showMessage(tr("There is a newer version available!"), true);
         else
             w->showMessage(tr("This is the most recent version!"), false);
-
-        reply->deleteLater();
     });
     networkManager->get(QNetworkRequest(QUrl(VERSION_DESCRIPTION_URL)));
 }

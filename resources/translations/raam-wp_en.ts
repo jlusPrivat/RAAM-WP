@@ -9,6 +9,21 @@
     </message>
 </context>
 <context>
+    <name>MainController</name>
+    <message>
+        <source>There is a newer version available!</source>
+        <translation>There is a newer version available!</translation>
+    </message>
+    <message>
+        <source>This is the most recent version!</source>
+        <translation>This is the most recent version!</translation>
+    </message>
+    <message>
+        <source>There was a network error.</source>
+        <translation>There was a network error.</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <source>Settings</source>
@@ -45,6 +60,10 @@
     <message>
         <source>Close Application</source>
         <translation>Close Application</translation>
+    </message>
+    <message>
+        <source>RAAM Event</source>
+        <translation>RAAM Event</translation>
     </message>
 </context>
 <context>
