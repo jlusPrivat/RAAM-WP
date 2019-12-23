@@ -46,6 +46,14 @@ MainWindow::~MainWindow () {
 
 
 
+void MainWindow::showMessage (QString msg, bool tray) {
+    statusbar->showMessage(QTime::currentTime().toString() +": " + msg);
+    if (!isVisible() && tray)
+        trayIcon->showMessage(tr("RAAM Event"), msg);
+}
+
+
+
 bool MainWindow::askForRestart () {
     // configure the message
     QMessageBox modal(QMessageBox::Question, tr("Restart RAAM?"),

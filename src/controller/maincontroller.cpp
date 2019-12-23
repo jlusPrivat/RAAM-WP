@@ -25,6 +25,8 @@ MainController::MainController (QObject *parent)
                      this, &MainController::parseOpenRequest);
     QObject::connect(w, &MainWindow::trayCloseApp,
                      this, [&]{parseCloseRequest(true);});
+    QObject::connect(w->settingsTab, &Settings::checkForUpdates,
+                     this, &MainController::checkForUpdates);
     QObject::connect(w->settingsTab, &Settings::closeRequested,
                      this, &MainController::parseCloseRequest);
     QObject::connect(w->settingsTab, &Settings::settingsUpdated,
@@ -38,6 +40,10 @@ MainController::MainController (QObject *parent)
     // show the window
     else
         w->show();
+
+    // check for updates
+    if (qSettings->value("startupupdatecheck", true).toBool())
+        checkForUpdates();
 }
 
 
@@ -71,6 +77,43 @@ void MainController::parseOpenRequest () {
         w->show();
         w->trayIcon->hide();
     }
+}
+
+
+
+void MainController::checkForUpdates () {
+    QObject::connect(networkManager, &QNetworkAccessManager::finished,
+                     this, [&](QNetworkReply* reply) {
+        QString latestVersion = reply->readAll();
+
+        // compare the output
+        QStringList latestVersionParts = latestVersion.split(" ").at(0).split(".");
+        QStringList currentVersionParts = QString(VERSION)
+                .split(" ").at(0).split(".");
+        int numLatestParts = latestVersionParts.count();
+        int numCurrentParts = currentVersionParts.count();
+        bool isNewer = false;
+        for (int i = 0; i < numLatestParts; i++) {
+            if (i >= numCurrentParts) {
+                isNewer = true;
+                break;
+            }
+            else if (latestVersionParts.at(i).toInt()
+                     > currentVersionParts.at(i).toInt()) {
+                isNewer = true;
+                break;
+            }
+        }
+
+        // if it is newer, output a message
+        if (isNewer)
+            w->showMessage(tr("There is a newer version available!"), true);
+        else
+            w->showMessage(tr("This is the most recent version!"), false);
+
+        reply->deleteLater();
+    });
+    networkManager->get(QNetworkRequest(QUrl(VERSION_DESCRIPTION_URL)));
 }
 
 

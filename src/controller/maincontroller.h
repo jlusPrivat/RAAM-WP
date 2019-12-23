@@ -5,6 +5,7 @@
 #include <QProcess>
 #include <QSettings>
 #include <QTranslator>
+#include <QtNetwork>
 #include "controller/language.h"
 #include "view/mainwindow.h"
 
@@ -36,6 +37,7 @@ private:
     MainWindow *w = nullptr;
     QTranslator *translator = new QTranslator(this);
     QSettings *qSettings = nullptr;
+    QNetworkAccessManager *networkManager = new QNetworkAccessManager(this);
 
     void updateLanguageController(QString);
 
@@ -43,6 +45,7 @@ private:
 private slots:
     void parseCloseRequest(bool);
     void parseOpenRequest();
+    void checkForUpdates();
     void updateSettings();
     void resetSettings();
 

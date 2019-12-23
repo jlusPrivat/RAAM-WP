@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTime>
 #include <QMessageBox>
 #include <QTabWidget>
 #include <QSystemTrayIcon>
@@ -23,6 +24,7 @@ public:
 
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void showMessage(QString, bool);
     bool askForRestart();
 
 

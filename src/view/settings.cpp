@@ -58,6 +58,8 @@ Settings::Settings (QWidget *parent)
     lUpdateCheck->addWidget(startupUpdateCheck);
     QPushButton *buttonCheckUpdate = new QPushButton(
                 tr("Check for updates now"), wUpdateCheck);
+    QObject::connect(buttonCheckUpdate, &QPushButton::clicked,
+                     this, &Settings::checkForUpdates);
     buttonCheckUpdate->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     lUpdateCheck->addWidget(buttonCheckUpdate);
 
