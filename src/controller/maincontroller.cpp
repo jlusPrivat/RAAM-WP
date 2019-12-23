@@ -32,8 +32,12 @@ MainController::MainController (QObject *parent)
     QObject::connect(w->settingsTab, &Settings::settingsReset,
                      this, &MainController::resetSettings);
 
+    // show the tray icon
+    if (qApp->arguments().contains("tray"))
+        w->trayIcon->show();
     // show the window
-    w->show();
+    else
+        w->show();
 }
 
 
@@ -78,13 +82,23 @@ void MainController::updateSettings () {
     qSettings->setValue("keepintray", s->keepInTray->isChecked());
 
     // autostart
+    QSettings bootUpSettings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows"
+                             "\\CurrentVersion\\Run", QSettings::NativeFormat);
+    QString appPath = qApp->applicationFilePath().replace('/', '\\');
     QString autostart;
-    if (s->autostartFull->isChecked())
+    if (s->autostartFull->isChecked()) {
         autostart = "full";
-    else if (s->autostartNone->isChecked())
+        bootUpSettings.setValue("raam", appPath);
+    }
+    else if (s->autostartNone->isChecked()) {
         autostart = "none";
-    else
+        if (bootUpSettings.contains("raam"))
+            bootUpSettings.remove("raam");
+    }
+    else {
         autostart = "tray";
+        bootUpSettings.setValue("raam", appPath + " tray");
+    }
     qSettings->setValue("autostart", autostart);
 
     // port

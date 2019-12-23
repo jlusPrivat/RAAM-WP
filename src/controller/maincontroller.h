@@ -10,7 +10,11 @@
 
 
 
-/* For settings used:
+/* Registry edits:
+ *  HKEY_CURRENT_USER\Software\Microsoft
+ *      \Windows\CurrentVersion\Run\raam
+ *
+ * For settings used:
  *  Organization: "jlus-privat"
  *  product: "RAAM-WP"
  *
