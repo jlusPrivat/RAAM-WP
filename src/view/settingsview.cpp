@@ -1,8 +1,8 @@
-#include "settings.h"
+#include "settingsview.h"
 
 
 
-Settings::Settings (QWidget *parent)
+SettingsView::SettingsView (QWidget *parent)
     : QScrollArea(parent) {
     // config the main widget
     setBackgroundRole(QPalette::Light);
@@ -22,17 +22,17 @@ Settings::Settings (QWidget *parent)
     QHBoxLayout *lServerId = new QHBoxLayout(wServerId);
     lServerId->setAlignment(Qt::AlignLeft);
     lServerId->setMargin(0);
-    QRegExp rx("[a-zA-Z][a-zA-Z0-9 _]{2,100}");
+    QRegExp rx("[a-zA-Z][a-zA-Z0-9 _\\-]{2,24}");
     serverId->setValidator(new QRegExpValidator(rx, this));
     serverId->setFixedWidth(300);
     lServerId->addWidget(serverId);
+    // server id warning
     QPixmap pmWarningIcon(":/imgs/warning.png");
-    pmWarningIcon.scaledToHeight(5);
     warningServerId = new QLabel(wServerId);
     warningServerId->setPixmap(pmWarningIcon);
     warningServerId->setToolTip(tr("- 3 to 100 characters allowed\n"
                                    "- Only alphanumeric, space and underscore\n"
-                                   "- Beginning only alphanumeric"));
+                                   "- Beginning only letters"));
     warningServerId->setVisible(false);
     lServerId->addWidget(warningServerId);
     connect(serverId, &QLineEdit::textChanged, this, [&]{
@@ -82,15 +82,21 @@ Settings::Settings (QWidget *parent)
     QPushButton *buttonCheckUpdate = new QPushButton(
                 tr("Check for updates now"), wUpdateCheck);
     connect(buttonCheckUpdate, &QPushButton::clicked,
-            this, &Settings::checkForUpdates);
+            this, &SettingsView::checkForUpdates);
     buttonCheckUpdate->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     lUpdateCheck->addWidget(buttonCheckUpdate);
 
+
     // buttons at the end
-    QHBoxLayout *lButtons = new QHBoxLayout;
+    QWidget *wButtons = new QWidget(this);
+    layout->addRow(wButtons);
+    QHBoxLayout *lButtons = new QHBoxLayout(wButtons);
+    lButtons->setMargin(0);
+
+    // save button incl. all "enable" connections
     buttonSave = new QPushButton(tr("Save"), wForm);
     connect(buttonSave, &QPushButton::clicked,
-            this, &Settings::settingsUpdated);
+            this, &SettingsView::settingsUpdated);
     connect(serverId, &QLineEdit::textChanged,
             this, [&]{buttonSave->setDisabled(false);});
     connect(keepInTray, &QCheckBox::stateChanged,
@@ -110,17 +116,18 @@ Settings::Settings (QWidget *parent)
     buttonSave->setDefault(true);
     lButtons->addWidget(buttonSave);
 
+    // reset button
     QPushButton *buttonReset = new QPushButton(tr("Reset"), wForm);
     connect(buttonReset, &QPushButton::clicked,
-            this, &Settings::settingsReset);
+            this, &SettingsView::settingsReset);
     buttonReset->setToolTip(tr("Reset form to abort editing configuration"));
     lButtons->addWidget(buttonReset);
 
+    // close button
     QPushButton *buttonClose = new QPushButton(tr("Close application"), wForm);
     connect(buttonClose, &QPushButton::clicked,
             this, [&]{closeRequested(true);});
     buttonClose->setToolTip(tr("Fully close the application (no tray)"));
     buttonClose->setStyleSheet("color: red;");
     lButtons->addWidget(buttonClose);
-    layout->addRow(lButtons);
 }

@@ -1,8 +1,8 @@
-#include "about.h"
+#include "aboutview.h"
 
 
 
-About::About (QWidget *parent)
+AboutView::AboutView (QWidget *parent)
     : QScrollArea(parent) {
     setBackgroundRole(QPalette::Light);
     setFrameShape(QFrame::NoFrame);

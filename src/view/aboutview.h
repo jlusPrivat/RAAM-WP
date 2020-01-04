@@ -9,12 +9,12 @@
 
 
 
-class About: public QScrollArea {
+class AboutView: public QScrollArea {
     Q_OBJECT
 
 
 public:
-    About(QWidget *parent = nullptr);
+    AboutView(QWidget *parent = nullptr);
 
 
 };

@@ -20,21 +20,23 @@ SOURCES += \
     controller/maincontroller.cpp \
     main.cpp \
     model/outputdevice.cpp \
-    view/about.cpp \
+    view/aboutview.cpp \
+    view/clientview.cpp \
     view/mainwindow.cpp \
     model/audiomanager.cpp \
-    view/settings.cpp
+    view/settingsview.cpp
 
 HEADERS += \
     controller/language.h \
     controller/maincontroller.h \
     model/outputdevice.h \
-    view/about.h \
+    view/aboutview.h \
+    view/clientview.h \
     view/mainwindow.h \
     model/audiomanager.h \
     utils/SafeRelease.h \
     utils/makros.h \
-    view/settings.h
+    view/settingsview.h
 
 LIBS += \
     "$$PWD\..\libs\Ole32.Lib" \

@@ -5,9 +5,9 @@
 MainWindow::MainWindow (QWidget *parent)
     : QMainWindow(parent) {
     // set the main windows config
-    this->setObjectName("mainWindow");
-    this->setWindowTitle("Remote Application Audio Mixer");
-    this->setMinimumSize(600, 300);
+    setObjectName("mainWindow");
+    setWindowTitle("Remote Application Audio Mixer");
+    setMinimumSize(680, 370);
 
     // add the TabWidget
     QWidget *centralWidget = new QWidget(this);
@@ -18,8 +18,9 @@ MainWindow::MainWindow (QWidget *parent)
     setCentralWidget(centralWidget);
 
     // add the specific tabs
-    tabBar->addTab(settingsTab = new Settings(this), tr("Settings"));
-    tabBar->addTab(new About(this), tr("About"));
+    tabBar->addTab(clientTab = new ClientView(this), tr("Clients"));
+    tabBar->addTab(settingsTab = new SettingsView(this), tr("Settings"));
+    tabBar->addTab(new AboutView(this), tr("About"));
 
     // add tray icon
     trayIcon = new QSystemTrayIcon(QIcon(":/imgs/tray.ico"), this);

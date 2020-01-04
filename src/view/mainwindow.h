@@ -8,8 +8,9 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QStatusBar>
-#include "view/settings.h"
-#include "view/about.h"
+#include "view/clientview.h"
+#include "view/settingsview.h"
+#include "view/aboutview.h"
 
 
 
@@ -18,7 +19,8 @@ class MainWindow: public QMainWindow {
 
 
 public:
-    Settings *settingsTab = nullptr;
+    ClientView *clientTab = nullptr;
+    SettingsView *settingsTab = nullptr;
     QStatusBar *statusbar = nullptr;
     QSystemTrayIcon *trayIcon = nullptr;
 

@@ -15,12 +15,12 @@
 
 
 
-class Settings: public QScrollArea {
+class SettingsView: public QScrollArea {
     Q_OBJECT
 
 
 public:
-    Settings(QWidget*);
+    SettingsView(QWidget*);
     QLineEdit *serverId = new QLineEdit(this);
     QCheckBox *keepInTray = new QCheckBox(this);
     QRadioButton *autostartFull = new QRadioButton(this);

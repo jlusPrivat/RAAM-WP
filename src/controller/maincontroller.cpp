@@ -25,13 +25,13 @@ MainController::MainController (QObject *parent)
                      this, &MainController::parseOpenRequest);
     QObject::connect(w, &MainWindow::trayCloseApp,
                      this, [&]{parseCloseRequest(true);});
-    QObject::connect(w->settingsTab, &Settings::checkForUpdates,
+    QObject::connect(w->settingsTab, &SettingsView::checkForUpdates,
                      this, &MainController::checkForUpdates);
-    QObject::connect(w->settingsTab, &Settings::closeRequested,
+    QObject::connect(w->settingsTab, &SettingsView::closeRequested,
                      this, &MainController::parseCloseRequest);
-    QObject::connect(w->settingsTab, &Settings::settingsUpdated,
+    QObject::connect(w->settingsTab, &SettingsView::settingsUpdated,
                      this, &MainController::updateSettings);
-    QObject::connect(w->settingsTab, &Settings::settingsReset,
+    QObject::connect(w->settingsTab, &SettingsView::settingsReset,
                      this, &MainController::resetSettings);
 
     // show the tray icon
@@ -170,7 +170,7 @@ void MainController::checkForUpdates () {
 
 
 void MainController::updateSettings () {
-    Settings *s = w->settingsTab;
+    SettingsView *s = w->settingsTab;
 
     // server id
     if (s->serverId->hasAcceptableInput())
@@ -224,7 +224,7 @@ void MainController::updateSettings () {
 
 
 void MainController::resetSettings () {
-    Settings *s = w->settingsTab;
+    SettingsView *s = w->settingsTab;
 
     // server id
     s->serverId->setText(readSetting(E_SERVERID).toString());

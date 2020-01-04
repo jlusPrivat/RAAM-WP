@@ -2,10 +2,89 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="de_DE">
 <context>
-    <name>About</name>
+    <name>AboutView</name>
     <message>
         <source>&lt;b&gt;Remote Application Audio Program&lt;/b&gt; (RAAM-WP), developed by &lt;a href=&quot;https://jlus.de&quot;&gt;Jonathan Lusky&lt;/a&gt; as &lt;a href=&quot;https://example.org&quot;&gt;bachelor&apos;s thesis&lt;/a&gt;.&lt;br&gt;&lt;br&gt;&lt;b&gt;Version&lt;/b&gt;&lt;br&gt;%1&lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions&lt;/b&gt;&lt;br&gt;RAAM is licensed under LGPL Version 3. Usage, modification and distribution are permitted. Anyone can contribute to the &lt;a href=&quot;https://github.com/jlusPrivat/RAAM-WP&quot;&gt;GitHub Project&lt;/a&gt; to improve this software.</source>
         <translation>&lt;b&gt;Remote Application Audio Program&lt;/b&gt; (RAAM-WP), entwickelt von &lt;a href=&quot;https://jlus.de&quot;&gt;Jonathan Lusky&lt;/a&gt; im Rahmen seiner &lt;a href=&quot;https://example.org&quot;&gt;Bachelorarbeit&lt;/a&gt;.&lt;br&gt;&lt;br&gt;&lt;b&gt;Version&lt;/b&gt;&lt;br&gt;%1&lt;br&gt;&lt;br&gt;&lt;b&gt;Nutzungsrechte&lt;/b&gt;&lt;br&gt;RAAM ist nach LGPL Version 3 lizenziert. Nutzung, Modifikation und Verteilung sind gestattet. Jeder kann über das &lt;a href=&quot;https://github.com/jlusPrivat/RAAM-W&quot;&gt;GitHub Projekt&lt;/a&gt; helfen, diese Software zu verbessern.</translation>
+    </message>
+</context>
+<context>
+    <name>ClientView</name>
+    <message>
+        <source>Client configuration</source>
+        <translation>Client Konfiguration</translation>
+    </message>
+    <message>
+        <source>Client ID:</source>
+        <translation>Client ID:</translation>
+    </message>
+    <message>
+        <source>If not set, the client will not be able to pair</source>
+        <translation>Wenn nicht gesetzt, kann der Client nicht verbinden</translation>
+    </message>
+    <message>
+        <source>Enabled:</source>
+        <translation>Aktiviert:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation>Beschreibung:</translation>
+    </message>
+    <message>
+        <source>Ask before pairing</source>
+        <translation>Vor dem Pairing fragen</translation>
+    </message>
+    <message>
+        <source>Ask Pairing:</source>
+        <translation>Fragen:</translation>
+    </message>
+    <message>
+        <source>Show notification when pairing</source>
+        <translation>Zeige Benachrichtigung beim Pairing an</translation>
+    </message>
+    <message>
+        <source>Notify Pairing:</source>
+        <translation>Benachrichtigung:</translation>
+    </message>
+    <message>
+        <source>Only plugged in Audio Endpoints will be visible</source>
+        <translation>Nur angeschlossene Audio Geräte sind sichtbar</translation>
+    </message>
+    <message>
+        <source>Only Plugged:</source>
+        <translation>Nur Angeschlossene:</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Speichern</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Zurücksetzen</translation>
+    </message>
+    <message>
+        <source>Pair</source>
+        <translation>Pair</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>Trennen</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation>Neu</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Löschen</translation>
+    </message>
+    <message>
+        <source>- 3 to 100 characters allowed
+- Only alphanumeric, space and underscore
+- Beginning only letters</source>
+        <translation>- 3 bis 100 Zeichen erlaubt
+- Nur Zahlen, Buchstaben, Leerzeichen oder Unterstrich
+- Nur mit Buchstaben beginnen</translation>
     </message>
 </context>
 <context>
@@ -65,9 +144,13 @@
         <source>RAAM Event</source>
         <translation>RAAM Event</translation>
     </message>
+    <message>
+        <source>Clients</source>
+        <translation>Clients</translation>
+    </message>
 </context>
 <context>
-    <name>Settings</name>
+    <name>SettingsView</name>
     <message>
         <source>Keep in tray:</source>
         <translation>Im Tray behalten:</translation>
@@ -139,10 +222,10 @@
     <message>
         <source>- 3 to 100 characters allowed
 - Only alphanumeric, space and underscore
-- Beginning only alphanumeric</source>
+- Beginning only letters</source>
         <translation>- 3 bis 100 Zeichen erlaubt
 - Nur Zahlen, Buchstaben, Leerzeichen oder Unterstrich
-- Nur mit Zahlen oder Buchstaben beginnen</translation>
+- Nur mit Buchstaben beginnen</translation>
     </message>
 </context>
 </TS>
