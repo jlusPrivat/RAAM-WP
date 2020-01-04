@@ -21,6 +21,7 @@
  *
  *  KEY                     DEFAULT         POSSIBLE
  *  language                "en"            "de", "en"
+ *  serverid                "RAAM SERVER"   [a-zA-Z][a-zA-Z0-9 _]{2,100})
  *  keepintray              true            true, false
  *  autostart               "tray"          "tray", "full", "none"
  *  port                    1030            1024 - 65535

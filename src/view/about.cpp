@@ -37,6 +37,7 @@ About::About (QWidget *parent)
                     "<br><br><b>Permissions</b><br>"
                     "RAAM is licensed under LGPL Version 3. Usage, "
                     "modification and distribution are permitted. Anyone can "
-                    "contribute to the <a href=\"\">GitHub Project</a> to "
-                    "improve this software.").arg(VERSION));
+                    "contribute to the "
+                    "<a href=\"https://github.com/jlusPrivat/RAAM-WP\">"
+                    "GitHub Project</a> to improve this software.").arg(VERSION));
 }

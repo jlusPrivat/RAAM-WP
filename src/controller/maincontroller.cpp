@@ -127,6 +127,12 @@ void MainController::checkForUpdates () {
 void MainController::updateSettings () {
     Settings *s = w->settingsTab;
 
+    // server id
+    if (s->serverId->hasAcceptableInput())
+        qSettings->setValue("serverid", s->serverId->text());
+    else
+        s->serverId->setText(qSettings->value("serverid", "RAAM SERVER").toString());
+
     // keep in tray
     qSettings->setValue("keepintray", s->keepInTray->isChecked());
 
@@ -172,6 +178,9 @@ void MainController::updateSettings () {
 
 void MainController::resetSettings () {
     Settings *s = w->settingsTab;
+
+    // server id
+    s->serverId->setText(qSettings->value("serverid", "RAAM SERVER").toString());
 
     // keep in tray
     s->keepInTray->setChecked(qSettings->value("keepintray",

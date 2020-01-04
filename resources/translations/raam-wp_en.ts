@@ -4,8 +4,8 @@
 <context>
     <name>About</name>
     <message>
-        <source>&lt;b&gt;Remote Application Audio Program&lt;/b&gt; (RAAM-WP), developed by &lt;a href=&quot;https://jlus.de&quot;&gt;Jonathan Lusky&lt;/a&gt; as &lt;a href=&quot;https://example.org&quot;&gt;bachelor&apos;s thesis&lt;/a&gt;.&lt;br&gt;&lt;br&gt;&lt;b&gt;Version&lt;/b&gt;&lt;br&gt;%1&lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions&lt;/b&gt;&lt;br&gt;RAAM is licensed under LGPL Version 3. Usage, modification and distribution are permitted. Anyone can contribute to the &lt;a href=&quot;&quot;&gt;GitHub Project&lt;/a&gt; to improve this software.</source>
-        <translation>&lt;b&gt;Remote Application Audio Program&lt;/b&gt; (RAAM-WP), developed by &lt;a href=&quot;https://jlus.de&quot;&gt;Jonathan Lusky&lt;/a&gt; as &lt;a href=&quot;https://example.org&quot;&gt;bachelor&apos;s thesis&lt;/a&gt;.&lt;br&gt;&lt;br&gt;&lt;b&gt;Version&lt;/b&gt;&lt;br&gt;%1&lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions&lt;/b&gt;&lt;br&gt;RAAM is licensed under LGPL Version 3. Usage, modification and distribution are permitted. Anyone can contribute to the &lt;a href=&quot;&quot;&gt;GitHub Project&lt;/a&gt; to improve this software.</translation>
+        <source>&lt;b&gt;Remote Application Audio Program&lt;/b&gt; (RAAM-WP), developed by &lt;a href=&quot;https://jlus.de&quot;&gt;Jonathan Lusky&lt;/a&gt; as &lt;a href=&quot;https://example.org&quot;&gt;bachelor&apos;s thesis&lt;/a&gt;.&lt;br&gt;&lt;br&gt;&lt;b&gt;Version&lt;/b&gt;&lt;br&gt;%1&lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions&lt;/b&gt;&lt;br&gt;RAAM is licensed under LGPL Version 3. Usage, modification and distribution are permitted. Anyone can contribute to the &lt;a href=&quot;https://github.com/jlusPrivat/RAAM-WP&quot;&gt;GitHub Project&lt;/a&gt; to improve this software.</source>
+        <translation>&lt;b&gt;Remote Application Audio Program&lt;/b&gt; (RAAM-WP), developed by &lt;a href=&quot;https://jlus.de&quot;&gt;Jonathan Lusky&lt;/a&gt; as &lt;a href=&quot;https://example.org&quot;&gt;bachelor&apos;s thesis&lt;/a&gt;.&lt;br&gt;&lt;br&gt;&lt;b&gt;Version&lt;/b&gt;&lt;br&gt;%1&lt;br&gt;&lt;br&gt;&lt;b&gt;Permissions&lt;/b&gt;&lt;br&gt;RAAM is licensed under LGPL Version 3. Usage, modification and distribution are permitted. Anyone can contribute to the &lt;a href=&quot;https://github.com/jlusPrivat/RAAM-WP&quot;&gt;GitHub Project&lt;/a&gt; to improve this software.</translation>
     </message>
 </context>
 <context>
@@ -131,6 +131,18 @@
     <message>
         <source>Fully close the application (no tray)</source>
         <translation>Fully close the application (no tray)</translation>
+    </message>
+    <message>
+        <source>Server-ID:</source>
+        <translation>Server-ID:</translation>
+    </message>
+    <message>
+        <source>- 3 to 100 characters allowed
+- Only alphanumeric, space and underscore
+- Beginning only alphanumeric</source>
+        <translation>- 3 to 100 characters allowed
+- Only alphanumeric, space and underscore
+- Beginning only alphanumeric</translation>
     </message>
 </context>
 </TS>

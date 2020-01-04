@@ -4,6 +4,8 @@
 #include <QScrollArea>
 #include <QFormLayout>
 #include <QLabel>
+#include <QRegExpValidator>
+#include <QLineEdit>
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QSpinBox>
@@ -19,6 +21,7 @@ class Settings: public QScrollArea {
 
 public:
     Settings(QWidget*);
+    QLineEdit *serverId = new QLineEdit(this);
     QCheckBox *keepInTray = new QCheckBox(this);
     QRadioButton *autostartFull = new QRadioButton(this);
     QRadioButton *autostartTray = new QRadioButton(this);
@@ -33,6 +36,10 @@ signals:
     void closeRequested(bool);
     void settingsUpdated();
     void settingsReset();
+
+
+private:
+    QLabel *warningServerId = nullptr;
 
 
 };

@@ -4,6 +4,7 @@
         <file>translations/raam-wp_en.qm</file>
         <file>imgs/logo.png</file>
         <file>imgs/tray.ico</file>
+        <file>imgs/warning.png</file>
         <file>imgs/flag-de.png</file>
         <file>imgs/flag-en.png</file>
     </qresource>
