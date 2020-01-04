@@ -88,10 +88,26 @@ Settings::Settings (QWidget *parent)
 
     // buttons at the end
     QHBoxLayout *lButtons = new QHBoxLayout;
-    QPushButton *buttonSave = new QPushButton(tr("Save"), wForm);
+    buttonSave = new QPushButton(tr("Save"), wForm);
     connect(buttonSave, &QPushButton::clicked,
             this, &Settings::settingsUpdated);
-    buttonSave->setStyleSheet("font-weight: bold;");
+    connect(serverId, &QLineEdit::textChanged,
+            this, [&]{buttonSave->setDisabled(false);});
+    connect(keepInTray, &QCheckBox::stateChanged,
+            this, [&]{buttonSave->setDisabled(false);});
+    connect(autostartFull, &QRadioButton::toggled,
+            this, [&]{buttonSave->setDisabled(false);});
+    connect(autostartTray, &QRadioButton::toggled,
+            this, [&]{buttonSave->setDisabled(false);});
+    connect(autostartNone, &QRadioButton::toggled,
+            this, [&]{buttonSave->setDisabled(false);});
+    connect(port, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, [&]{buttonSave->setDisabled(false);});
+    connect(language, &QComboBox::currentTextChanged,
+            this, [&]{buttonSave->setDisabled(false);});
+    connect(startupUpdateCheck, &QCheckBox::stateChanged,
+            this, [&]{buttonSave->setDisabled(false);});
+    buttonSave->setDefault(true);
     lButtons->addWidget(buttonSave);
 
     QPushButton *buttonReset = new QPushButton(tr("Reset"), wForm);

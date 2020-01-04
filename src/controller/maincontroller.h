@@ -28,6 +28,11 @@
  *  startupupdatecheck      true            true, false*/
 class MainController: public QObject {
     Q_OBJECT
+private:
+    enum Settingskey {
+        E_LANGUAGE, E_SERVERID, E_KEEPINTRAY, E_AUTOSTART, E_PORT,
+        E_STARTUPUDATECHECK
+    };
 
 
 public:
@@ -35,12 +40,16 @@ public:
 
 
 private:
+    // pointer
     MainWindow *w = nullptr;
     QTranslator *translator = new QTranslator(this);
     QSettings *qSettings = nullptr;
     QNetworkAccessManager *networkManager = new QNetworkAccessManager(this);
 
+    // methos
     void updateLanguageController(QString);
+    QVariant readSetting(Settingskey);
+    void writeSetting(Settingskey, QVariant);
 
 
 private slots:
@@ -49,6 +58,9 @@ private slots:
     void checkForUpdates();
     void updateSettings();
     void resetSettings();
+
+
+
 
 
 };

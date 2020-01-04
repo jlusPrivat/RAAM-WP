@@ -29,6 +29,7 @@ public:
     QSpinBox *port = new QSpinBox(this);
     QComboBox *language = new QComboBox(this);
     QCheckBox *startupUpdateCheck = new QCheckBox(this);
+    QPushButton *buttonSave = nullptr;
 
 
 signals:

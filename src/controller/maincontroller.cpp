@@ -8,7 +8,7 @@ MainController::MainController (QObject *parent)
     qSettings = new QSettings("jlus-privat", "RAAM-WP", this);
 
     // load the translation
-    QString configuredLanguage = qSettings->value("language", "en").toString();
+    QString configuredLanguage = readSetting(E_LANGUAGE).toString();
     translator->load(QLocale(configuredLanguage),
                     "raam-wp", "_", ":/translations");
     qApp->installTranslator(translator);
@@ -42,7 +42,7 @@ MainController::MainController (QObject *parent)
         w->show();
 
     // check for updates
-    if (qSettings->value("startupupdatecheck", true).toBool())
+    if (readSetting(E_STARTUPUDATECHECK).toBool())
         checkForUpdates();
 }
 
@@ -58,8 +58,53 @@ void MainController::updateLanguageController (QString langShort) {
 
 
 
+QVariant MainController::readSetting (Settingskey key) {
+    switch (key) {
+    case E_LANGUAGE:
+        return qSettings->value("language", "en");
+    case E_SERVERID:
+        return qSettings->value("serverid", "RAAM SERVER");
+    case E_KEEPINTRAY:
+        return qSettings->value("keepintray", true);
+    case E_AUTOSTART:
+        return qSettings->value("autostart", "tray");
+    case E_PORT:
+        return qSettings->value("port", 1030);
+    case E_STARTUPUDATECHECK:
+        return qSettings->value("startupupdatecheck", true);
+    }
+    return 0;
+}
+
+
+
+void MainController::writeSetting (Settingskey key, QVariant content) {
+    switch (key) {
+    case E_LANGUAGE:
+        qSettings->setValue("language", content);
+        break;
+    case E_SERVERID:
+        qSettings->setValue("serverid", content);
+        break;
+    case E_KEEPINTRAY:
+        qSettings->setValue("keepintray", content);
+        break;
+    case E_AUTOSTART:
+        qSettings->setValue("autostart", content);
+        break;
+    case E_PORT:
+        qSettings->setValue("port", content);
+        break;
+    case E_STARTUPUDATECHECK:
+        qSettings->setValue("startupupdatecheck", content);
+        break;
+    }
+}
+
+
+
 void MainController::parseCloseRequest (bool force) {
-    if (force || !qSettings->value("keepintray", true).toBool()) {
+    if (force || !readSetting(E_KEEPINTRAY).toBool()) {
         // fully close application
         qApp->quit();
     }
@@ -129,12 +174,12 @@ void MainController::updateSettings () {
 
     // server id
     if (s->serverId->hasAcceptableInput())
-        qSettings->setValue("serverid", s->serverId->text());
+        writeSetting(E_SERVERID, s->serverId->text());
     else
-        s->serverId->setText(qSettings->value("serverid", "RAAM SERVER").toString());
+        s->serverId->setText(readSetting(E_SERVERID).toString());
 
     // keep in tray
-    qSettings->setValue("keepintray", s->keepInTray->isChecked());
+    writeSetting(E_KEEPINTRAY, s->keepInTray->isChecked());
 
     // autostart
     QSettings bootUpSettings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows"
@@ -154,24 +199,26 @@ void MainController::updateSettings () {
         autostart = "tray";
         bootUpSettings.setValue("raam", appPath + " tray");
     }
-    qSettings->setValue("autostart", autostart);
+    writeSetting(E_AUTOSTART, autostart);
 
     // port
-    qSettings->setValue("port", s->port->value());
+    writeSetting(E_PORT, s->port->value());
 
     // automatic update check
-    qSettings->setValue("startupupdatecheck", s->startupUpdateCheck->isChecked());
+    writeSetting(E_STARTUPUDATECHECK, s->startupUpdateCheck->isChecked());
 
     // language
     QString newLanguage = s->language->currentData().toString();
-    if (newLanguage != qSettings->value("language", "en")) {
-        qSettings->setValue("language", newLanguage);
+    if (newLanguage != readSetting(E_LANGUAGE)) {
+        writeSetting(E_LANGUAGE, newLanguage);
         updateLanguageController(newLanguage);
         if (w->askForRestart()) {
             qApp->quit();
             QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
         }
     }
+
+    s->buttonSave->setDisabled(true);
 }
 
 
@@ -180,14 +227,13 @@ void MainController::resetSettings () {
     Settings *s = w->settingsTab;
 
     // server id
-    s->serverId->setText(qSettings->value("serverid", "RAAM SERVER").toString());
+    s->serverId->setText(readSetting(E_SERVERID).toString());
 
     // keep in tray
-    s->keepInTray->setChecked(qSettings->value("keepintray",
-                                               true).toBool());
+    s->keepInTray->setChecked(readSetting(E_KEEPINTRAY).toBool());
 
     // autostart
-    QString autostart = qSettings->value("autostart", "tray").toString();
+    QString autostart = readSetting(E_AUTOSTART).toString();
     if (autostart == "full")
         s->autostartFull->setChecked(true);
     else if (autostart == "none")
@@ -196,11 +242,10 @@ void MainController::resetSettings () {
         s->autostartTray->setChecked(true);
 
     // port
-    s->port->setValue(qSettings->value("port", 1030).toInt());
+    s->port->setValue(readSetting(E_PORT).toInt());
 
     // automatic update check
-    s->startupUpdateCheck->setChecked(qSettings->value("startupupdatecheck",
-                                                       true).toBool());
+    s->startupUpdateCheck->setChecked(readSetting(E_STARTUPUDATECHECK).toBool());
 
     // language
     auto langs = Language::languages;
@@ -210,4 +255,6 @@ void MainController::resetSettings () {
         if (lang->isSelected)
             s->language->setCurrentIndex(i);
     }
+
+    s->buttonSave->setDisabled(true);
 }
