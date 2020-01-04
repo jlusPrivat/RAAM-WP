@@ -3,25 +3,32 @@
 
 
 SettingsView::SettingsView (QWidget *parent)
-    : QScrollArea(parent) {
+    : QWidget(parent) {
     // config the main widget
     setBackgroundRole(QPalette::Light);
-    setFrameShape(QFrame::NoFrame);
-    setWidgetResizable(true);
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    QVBoxLayout *layout = new QVBoxLayout(this);
 
-    QWidget *wForm = new QWidget(this);
-    setWidget(wForm);
-    QFormLayout *layout = new QFormLayout(wForm);
-    layout->setSpacing(20);
+    // config the scrollable settings
+    QScrollArea *wScrollable = new QScrollArea(this);
+    layout->addWidget(wScrollable);
+    wScrollable->setFrameShape(QFrame::NoFrame);
+    wScrollable->setWidgetResizable(true);
+    wScrollable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    wScrollable->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    // another form has to be encapsulated
+    QWidget *wForm = new QWidget(wScrollable);
+    wScrollable->setWidget(wForm);
+    QFormLayout *lForm = new QFormLayout(wForm);
+    lForm->setSpacing(15);
 
     // server id
     QWidget *wServerId = new QWidget(wForm);
-    layout->addRow(tr("Server-ID:"), wServerId);
+    lForm->addRow(tr("Server-ID:"), wServerId);
     QHBoxLayout *lServerId = new QHBoxLayout(wServerId);
     lServerId->setAlignment(Qt::AlignLeft);
     lServerId->setMargin(0);
+    // server Id field
+    serverId = new QLineEdit(wServerId);
     QRegExp rx("[a-zA-Z][a-zA-Z0-9 _\\-]{2,24}");
     serverId->setValidator(new QRegExpValidator(rx, this));
     serverId->setFixedWidth(300);
@@ -40,28 +47,34 @@ SettingsView::SettingsView (QWidget *parent)
     });
 
     // keep in tray
+    keepInTray = new QCheckBox(wForm);
     keepInTray->setText(tr("Keep this application running in "
                            "tray when closing it"));
-    layout->addRow(tr("Keep in tray:"), keepInTray);
+    lForm->addRow(tr("Keep in tray:"), keepInTray);
 
     // autostart
     QWidget *wAutostart = new QWidget(wForm);
-    layout->addRow(tr("Autostart:"), wAutostart);
+    lForm->addRow(tr("Autostart:"), wAutostart);
     QVBoxLayout *lAutostart = new QVBoxLayout(wAutostart);
     lAutostart->setMargin(0);
+    autostartFull = new QRadioButton(wAutostart);
     autostartFull->setText(tr("Start RAAM, when logging in into windows"));
     lAutostart->addWidget(autostartFull);
+    autostartTray = new QRadioButton(wAutostart);
     autostartTray->setText(tr("Start RAAM in tray, when logging in into windows"));
     lAutostart->addWidget(autostartTray);
+    autostartNone = new QRadioButton(wAutostart);
     autostartNone->setText(tr("Do not start RAAM with windows"));
     lAutostart->addWidget(autostartNone);
 
     // port
+    port = new QSpinBox(wForm);
     port->setRange(1024, 65535);
     port->setFixedWidth(300);
-    layout->addRow(tr("Network port:"), port);
+    lForm->addRow(tr("Network port:"), port);
 
     // language
+    language = new QComboBox(wForm);
     auto langs = Language::languages;
     const int numEntries = langs.count();
     for (int i = 0; i < numEntries; i++) {
@@ -70,11 +83,12 @@ SettingsView::SettingsView (QWidget *parent)
                           lang->nameFull, lang->nameShort);
     }
     language->setFixedWidth(300);
-    layout->addRow(tr("Language:"), language);
+    lForm->addRow(tr("Language:"), language);
 
     // startup update check
+    startupUpdateCheck = new QCheckBox(wForm);
     QWidget *wUpdateCheck = new QWidget(wForm);
-    layout->addRow(tr("Update check:"), wUpdateCheck);
+    lForm->addRow(tr("Update check:"), wUpdateCheck);
     QVBoxLayout *lUpdateCheck = new QVBoxLayout(wUpdateCheck);
     lUpdateCheck->setMargin(0);
     startupUpdateCheck->setText(tr("Check for updates, when the application starts"));
@@ -89,7 +103,7 @@ SettingsView::SettingsView (QWidget *parent)
 
     // buttons at the end
     QWidget *wButtons = new QWidget(this);
-    layout->addRow(wButtons);
+    layout->addWidget(wButtons);
     QHBoxLayout *lButtons = new QHBoxLayout(wButtons);
     lButtons->setMargin(0);
 

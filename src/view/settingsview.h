@@ -15,20 +15,20 @@
 
 
 
-class SettingsView: public QScrollArea {
+class SettingsView: public QWidget {
     Q_OBJECT
 
 
 public:
     SettingsView(QWidget*);
-    QLineEdit *serverId = new QLineEdit(this);
-    QCheckBox *keepInTray = new QCheckBox(this);
-    QRadioButton *autostartFull = new QRadioButton(this);
-    QRadioButton *autostartTray = new QRadioButton(this);
-    QRadioButton *autostartNone = new QRadioButton(this);
-    QSpinBox *port = new QSpinBox(this);
-    QComboBox *language = new QComboBox(this);
-    QCheckBox *startupUpdateCheck = new QCheckBox(this);
+    QLineEdit *serverId = nullptr;
+    QCheckBox *keepInTray = nullptr;
+    QRadioButton *autostartFull = nullptr;
+    QRadioButton *autostartTray = nullptr;
+    QRadioButton *autostartNone = nullptr;
+    QSpinBox *port = nullptr;
+    QComboBox *language = nullptr;
+    QCheckBox *startupUpdateCheck = nullptr;
     QPushButton *buttonSave = nullptr;
 
 
