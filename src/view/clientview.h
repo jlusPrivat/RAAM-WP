@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QScrollArea>
 #include <QGroupBox>
-#include <QListView>
+#include <QListWidget>
 #include <QHBoxLayout>
 #include <QFormLayout>
 #include <QGridLayout>
@@ -21,8 +21,10 @@ class ClientView: public QScrollArea {
 
 
 public:
+    // enumerations
+    enum IconType {E_ICON_PAIRED, E_ICON_ACTIVE, E_ICON_INACTIVE};
+
     // properties
-    QListView *listView = nullptr;
     QPushButton *listBtnAdd = nullptr;
     QPushButton *listBtnRemove = nullptr;
 
@@ -40,19 +42,37 @@ public:
 
     // methods
     ClientView(QWidget* = nullptr);
+    void lstAddItem(QString, IconType);
+    void lstRemoveItem(QString);
+    void updateItem(QString, QString, IconType);
 
 
 signals:
     void addNewClient();
-    void removeClient();
-    void saveClient();
+    void removeClient(QString);
     void selectClient(QString);
+    void unselectClient();
+    void saveClient(QString);
     void openPairWindow(QString);
     void disconnectClient(QString);
 
 
 private:
+    // properties
+    QListWidget *listView = nullptr;
     QLabel *warningClientId = nullptr;
+
+    // methods
+    QListWidgetItem* getItemById(QString);
+    QString getIcon(IconType);
+
+    // nested classes
+    class ClientIdValidator: public QRegExpValidator {
+    public:
+        ClientIdValidator(ClientView*);
+        State validate(QString&, int&) const override;
+        ClientView *cw = nullptr;
+    };
 
 
 };

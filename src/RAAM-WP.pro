@@ -19,6 +19,7 @@ SOURCES += \
     controller/language.cpp \
     controller/maincontroller.cpp \
     main.cpp \
+    model/client.cpp \
     model/outputdevice.cpp \
     view/aboutview.cpp \
     view/clientview.cpp \
@@ -29,6 +30,7 @@ SOURCES += \
 HEADERS += \
     controller/language.h \
     controller/maincontroller.h \
+    model/client.h \
     model/outputdevice.h \
     view/aboutview.h \
     view/clientview.h \

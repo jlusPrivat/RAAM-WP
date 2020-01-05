@@ -80,11 +80,13 @@
     </message>
     <message>
         <source>- 3 to 100 characters allowed
-- Only alphanumeric, space and underscore
-- Beginning only letters</source>
+- Only lowercase alphanumeric, space and underscore
+- Beginning only letters
+- No identical other client id</source>
         <translation>- 3 to 100 characters allowed
-- Only alphanumeric, space and underscore
-- Beginning only letters</translation>
+- Only lowercase alphanumeric, space and underscore
+- Beginning only letters
+- No identical other client id</translation>
     </message>
 </context>
 <context>
@@ -100,6 +102,11 @@
     <message>
         <source>There was a network error.</source>
         <translation>There was a network error.</translation>
+    </message>
+    <message>
+        <source>new client</source>
+        <extracomment>Translation must obey the rules for client ids</extracomment>
+        <translation>new client</translation>
     </message>
 </context>
 <context>

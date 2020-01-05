@@ -18,21 +18,48 @@ MainController::MainController (QObject *parent)
     w = new MainWindow();
     resetSettings();
 
-    // connect the signals with the window
-    QObject::connect(w, &MainWindow::closeRequested,
-                     this, &MainController::parseCloseRequest);
-    QObject::connect(w, &MainWindow::trayOpenApp,
-                     this, &MainController::parseOpenRequest);
-    QObject::connect(w, &MainWindow::trayCloseApp,
-                     this, [&]{parseCloseRequest(true);});
-    QObject::connect(w->settingsTab, &SettingsView::checkForUpdates,
-                     this, &MainController::checkForUpdates);
-    QObject::connect(w->settingsTab, &SettingsView::closeRequested,
-                     this, &MainController::parseCloseRequest);
-    QObject::connect(w->settingsTab, &SettingsView::settingsUpdated,
-                     this, &MainController::updateSettings);
-    QObject::connect(w->settingsTab, &SettingsView::settingsReset,
-                     this, &MainController::resetSettings);
+    // connect the signals with the main window
+    connect(w, &MainWindow::closeRequested,
+            this, &MainController::parseCloseRequest);
+    connect(w, &MainWindow::trayOpenApp,
+            this, &MainController::parseOpenRequest);
+    connect(w, &MainWindow::trayCloseApp,
+            this, [&]{parseCloseRequest(true);});
+    // connect the signals with the settings tab
+    connect(w->settingsTab, &SettingsView::checkForUpdates,
+            this, &MainController::checkForUpdates);
+    connect(w->settingsTab, &SettingsView::closeRequested,
+            this, &MainController::parseCloseRequest);
+    connect(w->settingsTab, &SettingsView::settingsUpdated,
+            this, &MainController::updateSettings);
+    connect(w->settingsTab, &SettingsView::settingsReset,
+            this, &MainController::resetSettings);
+    // connect the signals with the clients tab
+    connect(w->clientTab, &ClientView::addNewClient,
+            this, &MainController::addNewClient);
+    connect(w->clientTab, &ClientView::removeClient,
+            this, &MainController::removeClient);
+    connect(w->clientTab, &ClientView::selectClient,
+            this, &MainController::selectClient);
+    connect(w->clientTab, &ClientView::unselectClient,
+            this, &MainController::unselectClient);
+    connect(w->clientTab, &ClientView::saveClient,
+            this, &MainController::saveClient);
+    connect(w->clientTab, &ClientView::disconnectClient,
+            this, &MainController::disconnectClient);
+
+    // load all clients into the listview
+    qSettings->beginGroup("clients");
+    QStringList allClientIds = qSettings->childGroups();
+    qSettings->endGroup();
+    int numClients = allClientIds.count();
+    for (int i = 0; i < numClients; i++) {
+        QString clientName = allClientIds.at(i);
+        Client *newClient = new Client(clientName, qSettings, this);
+        newClient->loadConfig();
+        clients.append(newClient);
+        w->clientTab->lstAddItem(clientName, determineClientIcon(newClient));
+    }
 
     // show the tray icon
     if (qApp->arguments().contains("tray"))
@@ -99,6 +126,28 @@ void MainController::writeSetting (Settingskey key, QVariant content) {
         qSettings->setValue("startupupdatecheck", content);
         break;
     }
+}
+
+
+
+Client* MainController::getClientById (QString id) {
+    int count = clients.count();
+    for (int i = 0; i < count; i++) {
+        Client* ce = clients.at(i);
+        if (ce->getId() == id)
+            return ce;
+    }
+    return nullptr;
+}
+
+
+
+ClientView::IconType MainController::determineClientIcon (Client* client) {
+    if (client->isPaired())
+        return ClientView::E_ICON_PAIRED;
+    else if (client->isActive())
+        return ClientView::E_ICON_ACTIVE;
+    return ClientView::E_ICON_INACTIVE;
 }
 
 
@@ -257,4 +306,128 @@ void MainController::resetSettings () {
     }
 
     s->buttonSave->setDisabled(true);
+}
+
+
+
+void MainController::addNewClient () {
+    // find a good new name
+    //: Translation must obey the rules for client ids
+    QString newNameBase = tr("new client");
+    int newNameNum = 1;
+    QString newName = newNameBase;
+    while (getClientById(newName))
+        newName = QStringLiteral("%1 %2").arg(newNameBase).arg(newNameNum++);
+    w->clientTab->lstAddItem(newName, ClientView::E_ICON_INACTIVE);
+
+    // generate a new client
+    Client *newClient = new Client(newName, qSettings, this);
+    newClient->setActive(false);
+    newClient->saveConfig();
+    clients.append(newClient);
+}
+
+
+
+void MainController::removeClient (QString id) {
+    Client *client = getClientById(id);
+    if (!client)
+        return;
+
+    clients.removeAll(client);
+    client->removeFromConfig();
+    delete client;
+    w->clientTab->lstRemoveItem(id);
+}
+
+
+
+void MainController::selectClient (QString id) {
+    Client *client = getClientById(id);
+    if (!client) {
+        unselectClient();
+        return;
+    }
+    ClientView *cw = w->clientTab;
+
+    // set fields content
+    cw->confClientId->setText(client->getId());
+    cw->confActive->setChecked(client->isActive());
+    cw->confDescription->setPlainText(client->description);
+    cw->confAskPairing->setChecked(client->askBeforeConnect);
+    cw->confShowNotification->setChecked(client->showNotificationOnConnect);
+    cw->confOnlyPluggedIn->setChecked(client->isOnlyPluggedInDevices());
+
+    // set fields enabled
+    cw->listBtnRemove->setDisabled(false);
+    cw->confBox->setDisabled(false);
+    cw->confBtnSave->setDisabled(true);
+    cw->confBtnPair->setDisabled(client->isPaired());
+    cw->confBtnDisconnect->setEnabled(client->isPaired());
+}
+
+
+
+void MainController::unselectClient () {
+    ClientView *cw = w->clientTab;
+
+    // clear fields
+    cw->confClientId->clear();
+    cw->confActive->setChecked(false);
+    cw->confDescription->clear();
+    cw->confAskPairing->setChecked(false);
+    cw->confShowNotification->setChecked(false);
+    cw->confOnlyPluggedIn->setChecked(false);
+
+    // set fields disabled
+    cw->listBtnRemove->setDisabled(true);
+    cw->confBox->setDisabled(true);
+}
+
+
+
+void MainController::saveClient (QString id) {
+    Client *client = getClientById(id);
+    if (!client) {
+        unselectClient();
+        return;
+    }
+    ClientView *cw = w->clientTab;
+
+    // set the properties
+    if (cw->confClientId->hasAcceptableInput())
+        client->setId(cw->confClientId->text());
+    else
+        cw->confClientId->setText(client->getId());
+    client->setActive(cw->confActive->isChecked());
+    client->description = cw->confDescription->toPlainText();
+    client->askBeforeConnect = cw->confAskPairing->isChecked();
+    client->showNotificationOnConnect = cw->confShowNotification->isChecked();
+    client->setOnlyPluggedInDevices(cw->confOnlyPluggedIn->isChecked());
+    client->saveConfig();
+
+    // update the listview, if needed
+    cw->updateItem(id, client->getId(), determineClientIcon(client));
+
+    // disable the save field
+    cw->confBtnSave->setDisabled(true);
+}
+
+
+
+void MainController::disconnectClient (QString id) {
+    Client *client = getClientById(id);
+    if (!client) {
+        unselectClient();
+        return;
+    }
+    ClientView *cw = w->clientTab;
+
+    // unpair
+    client->unpair();
+    // update buttons
+    cw->confBtnPair->setDisabled(false);
+    cw->confBtnDisconnect->setDisabled(true);
+    // update icon
+    cw->updateItem(id, id, determineClientIcon(client));
 }

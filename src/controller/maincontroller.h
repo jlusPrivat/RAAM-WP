@@ -7,6 +7,7 @@
 #include <QTranslator>
 #include <QtNetwork>
 #include "controller/language.h"
+#include "model/client.h"
 #include "view/mainwindow.h"
 
 
@@ -40,29 +41,41 @@ public:
 
 
 private:
-    // pointer
+    // properties
     MainWindow *w = nullptr;
     QTranslator *translator = new QTranslator(this);
     QSettings *qSettings = nullptr;
     QNetworkAccessManager *networkManager = new QNetworkAccessManager(this);
+    QList<Client*> clients;
 
     // methos
     void updateLanguageController(QString);
     QVariant readSetting(Settingskey);
     void writeSetting(Settingskey, QVariant);
+    Client* getClientById(QString);
+    ClientView::IconType determineClientIcon(Client*);
 
 
 private slots:
+    // mainwindow
     void parseCloseRequest(bool);
     void parseOpenRequest();
+    // settings view
     void checkForUpdates();
     void updateSettings();
     void resetSettings();
-
-
-
+    // client view
+    void addNewClient();
+    void removeClient(QString);
+    void selectClient(QString);
+    void unselectClient();
+    void saveClient(QString);
+    //void openPairWindow(QString);
+    void disconnectClient(QString);
 
 
 };
+
+
 
 #endif // MAINCONTROLLER_H

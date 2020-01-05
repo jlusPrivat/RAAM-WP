@@ -14,12 +14,12 @@ The client can then save those connection information and use them to connect at
 ### Reading the QR Code
 *!!! QR Code not finalized yet: Still pending*  
 The QR Code contains these information in this exact order.  
-* Server Name (Null terminated ascii character string; Max 100 characters; RegEx: [a-zA-Z][a-zA-Z0-9 _\-]{2,24})
+* Server Name (Null terminated ascii character string; Max 100 characters; RegEx: [a-zA-Z][a-zA-Z0-9 _\-]{1,23}[a-zA-Z0-9])
 * Server Software (Null terminated, ascii character string representing the name of the software e.g. "RAAM-WP")
 * Server RAAM software version. (Null terminated, ascii character string; Semantic Versioning)
 * Server IP adress (4x ascii bit integer in left-to-right order; Big Endian style)
 * Server port (unsigned 16 bit integer, range 1024..65535)
-* Client ID (Null terminated ascii character string; Max 100 characters; RegEx: [a-zA-Z][a-zA-Z0-9 _\-]{2,24})
+* Client ID (Null terminated ascii character string; Max 100 characters; RegEx: [a-z][a-z0-9 _\\-]{1,23}[a-z0-9])
 * Client specific hmac shared secret (64 Bytes; Big Endian)
 
 

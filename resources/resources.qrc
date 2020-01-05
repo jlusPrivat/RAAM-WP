@@ -6,6 +6,9 @@
         <file>imgs/tray.ico</file>
         <file>imgs/add-icon.png</file>
         <file>imgs/delete-icon.png</file>
+        <file>imgs/paired-icon.png</file>
+        <file>imgs/active-icon.png</file>
+        <file>imgs/inactive-icon.png</file>
         <file>imgs/warning.png</file>
         <file>imgs/flag-de.png</file>
         <file>imgs/flag-en.png</file>

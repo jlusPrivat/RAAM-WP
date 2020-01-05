@@ -29,7 +29,7 @@ SettingsView::SettingsView (QWidget *parent)
     lServerId->setMargin(0);
     // server Id field
     serverId = new QLineEdit(wServerId);
-    QRegExp rx("[a-zA-Z][a-zA-Z0-9 _\\-]{2,24}");
+    QRegExp rx("[a-zA-Z][a-zA-Z0-9 _\\-]{1,23}[a-zA-Z0-9]");
     serverId->setValidator(new QRegExpValidator(rx, this));
     serverId->setFixedWidth(300);
     lServerId->addWidget(serverId);
