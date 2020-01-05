@@ -47,10 +47,10 @@ public:
 
 
 signals:
-    void paired();
-    void unpaired();
-    void commanded(); // Add command here
-    void errored(Connectionerror);
+    void sigPaired();
+    void sigUnpaired();
+    void sigCommanded(); // Add command here
+    void sigErrored(Connectionerror);
 
 
 public slots:

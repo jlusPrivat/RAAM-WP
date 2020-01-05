@@ -48,13 +48,13 @@ public:
 
 
 signals:
-    void addNewClient();
-    void removeClient(QString);
-    void selectClient(QString);
-    void unselectClient();
-    void saveClient(QString);
-    void openPairWindow(QString);
-    void disconnectClient(QString);
+    void sigAddNewClient();
+    void sigRemoveClient(QString);
+    void sigSelectClient(QString);
+    void sigUnselectClient();
+    void sigSaveClient(QString);
+    void sigOpenPairWindow(QString);
+    void sigDisconnectClient(QString);
 
 
 private:

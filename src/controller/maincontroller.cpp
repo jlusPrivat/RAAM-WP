@@ -19,33 +19,33 @@ MainController::MainController (QObject *parent)
     resetSettings();
 
     // connect the signals with the main window
-    connect(w, &MainWindow::closeRequested,
+    connect(w, &MainWindow::sigCloseRequested,
             this, &MainController::parseCloseRequest);
-    connect(w, &MainWindow::trayOpenApp,
+    connect(w, &MainWindow::sigTrayOpenApp,
             this, &MainController::parseOpenRequest);
-    connect(w, &MainWindow::trayCloseApp,
+    connect(w, &MainWindow::sigTrayCloseApp,
             this, [&]{parseCloseRequest(true);});
     // connect the signals with the settings tab
-    connect(w->settingsTab, &SettingsView::checkForUpdates,
+    connect(w->settingsTab, &SettingsView::sigCheckForUpdates,
             this, &MainController::checkForUpdates);
-    connect(w->settingsTab, &SettingsView::closeRequested,
+    connect(w->settingsTab, &SettingsView::sigCloseRequested,
             this, &MainController::parseCloseRequest);
-    connect(w->settingsTab, &SettingsView::settingsUpdated,
-            this, &MainController::updateSettings);
-    connect(w->settingsTab, &SettingsView::settingsReset,
+    connect(w->settingsTab, &SettingsView::sigSettingsUpdated,
+            this, &MainController::saveSettings);
+    connect(w->settingsTab, &SettingsView::sigSettingsReset,
             this, &MainController::resetSettings);
     // connect the signals with the clients tab
-    connect(w->clientTab, &ClientView::addNewClient,
+    connect(w->clientTab, &ClientView::sigAddNewClient,
             this, &MainController::addNewClient);
-    connect(w->clientTab, &ClientView::removeClient,
+    connect(w->clientTab, &ClientView::sigRemoveClient,
             this, &MainController::removeClient);
-    connect(w->clientTab, &ClientView::selectClient,
+    connect(w->clientTab, &ClientView::sigSelectClient,
             this, &MainController::selectClient);
-    connect(w->clientTab, &ClientView::unselectClient,
+    connect(w->clientTab, &ClientView::sigUnselectClient,
             this, &MainController::unselectClient);
-    connect(w->clientTab, &ClientView::saveClient,
+    connect(w->clientTab, &ClientView::sigSaveClient,
             this, &MainController::saveClient);
-    connect(w->clientTab, &ClientView::disconnectClient,
+    connect(w->clientTab, &ClientView::sigDisconnectClient,
             this, &MainController::disconnectClient);
 
     // load all clients into the listview
@@ -218,7 +218,7 @@ void MainController::checkForUpdates () {
 
 
 
-void MainController::updateSettings () {
+void MainController::saveSettings () {
     SettingsView *s = w->settingsTab;
 
     // server id

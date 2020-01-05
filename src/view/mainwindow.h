@@ -35,9 +35,9 @@ private:
 
 
 signals:
-    void closeRequested(bool);
-    void trayOpenApp();
-    void trayCloseApp();
+    void sigCloseRequested(bool);
+    void sigTrayOpenApp();
+    void sigTrayCloseApp();
 
 
 };

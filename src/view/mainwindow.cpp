@@ -26,13 +26,13 @@ MainWindow::MainWindow (QWidget *parent)
     trayIcon = new QSystemTrayIcon(QIcon(":/imgs/tray.ico"), this);
     trayIcon->setToolTip(tr("Remote Application Audio Mixer"));
     QMenu *trayMenu = new QMenu(this);
-    trayMenu->addAction(tr("Open Application"), this, &MainWindow::trayOpenApp);
-    trayMenu->addAction(tr("Close Application"), this, &MainWindow::trayCloseApp);
+    trayMenu->addAction(tr("Open Application"), this, &MainWindow::sigTrayOpenApp);
+    trayMenu->addAction(tr("Close Application"), this, &MainWindow::sigTrayCloseApp);
     trayIcon->setContextMenu(trayMenu);
     QObject::connect(trayIcon, &QSystemTrayIcon::activated, this,
                      [&](QSystemTrayIcon::ActivationReason reason){
                         if (reason == QSystemTrayIcon::Trigger)
-                            trayOpenApp();
+                            sigTrayOpenApp();
                      });
 
     // add statusbar
@@ -77,6 +77,6 @@ bool MainWindow::askForRestart () {
 
 
 void MainWindow::closeEvent (QCloseEvent *event) {
-    closeRequested(false);
+    sigCloseRequested(false);
     event->ignore();
 }

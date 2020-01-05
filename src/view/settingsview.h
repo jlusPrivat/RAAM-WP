@@ -33,10 +33,10 @@ public:
 
 
 signals:
-    void checkForUpdates();
-    void closeRequested(bool);
-    void settingsUpdated();
-    void settingsReset();
+    void sigCheckForUpdates();
+    void sigCloseRequested(bool);
+    void sigSettingsUpdated();
+    void sigSettingsReset();
 
 
 private:

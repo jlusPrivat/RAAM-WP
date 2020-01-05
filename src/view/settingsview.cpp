@@ -96,7 +96,7 @@ SettingsView::SettingsView (QWidget *parent)
     QPushButton *buttonCheckUpdate = new QPushButton(
                 tr("Check for updates now"), wUpdateCheck);
     connect(buttonCheckUpdate, &QPushButton::clicked,
-            this, &SettingsView::checkForUpdates);
+            this, &SettingsView::sigCheckForUpdates);
     buttonCheckUpdate->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     lUpdateCheck->addWidget(buttonCheckUpdate);
 
@@ -110,7 +110,7 @@ SettingsView::SettingsView (QWidget *parent)
     // save button incl. all "enable" connections
     buttonSave = new QPushButton(tr("Save"), wForm);
     connect(buttonSave, &QPushButton::clicked,
-            this, &SettingsView::settingsUpdated);
+            this, &SettingsView::sigSettingsUpdated);
     connect(serverId, &QLineEdit::textChanged,
             this, [&]{buttonSave->setDisabled(false);});
     connect(keepInTray, &QCheckBox::stateChanged,
@@ -133,14 +133,14 @@ SettingsView::SettingsView (QWidget *parent)
     // reset button
     QPushButton *buttonReset = new QPushButton(tr("Reset"), wForm);
     connect(buttonReset, &QPushButton::clicked,
-            this, &SettingsView::settingsReset);
+            this, &SettingsView::sigSettingsReset);
     buttonReset->setToolTip(tr("Reset form to abort editing configuration"));
     lButtons->addWidget(buttonReset);
 
     // close button
     QPushButton *buttonClose = new QPushButton(tr("Close application"), wForm);
     connect(buttonClose, &QPushButton::clicked,
-            this, [&]{closeRequested(true);});
+            this, [&]{sigCloseRequested(true);});
     buttonClose->setToolTip(tr("Fully close the application (no tray)"));
     buttonClose->setStyleSheet("color: red;");
     lButtons->addWidget(buttonClose);

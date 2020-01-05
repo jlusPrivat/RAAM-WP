@@ -31,16 +31,16 @@ ClientView::ClientView (QWidget *parent)
     connect(listView, &QListWidget::itemSelectionChanged, this, [&]{
         QListWidgetItem *item = listView->currentItem();
         if (item)
-            selectClient(item->text());
+            sigSelectClient(item->text());
         else
-            unselectClient();
+            sigUnselectClient();
     });
     lList->addWidget(listView, 0, 0, 1, 2);
 
     // add the add button
     listBtnAdd = new QPushButton(QIcon(":/imgs/add-icon.png"),
                                  tr("New"), wList);
-    connect(listBtnAdd, &QPushButton::clicked, this, &ClientView::addNewClient);
+    connect(listBtnAdd, &QPushButton::clicked, this, &ClientView::sigAddNewClient);
     lList->addWidget(listBtnAdd, 1, 0);
 
     // add the delete button
@@ -50,7 +50,7 @@ ClientView::ClientView (QWidget *parent)
     connect(listBtnRemove, &QPushButton::clicked, this, [&]{
         QListWidgetItem *item = listView->currentItem();
         if (item)
-            removeClient(item->text());
+            sigRemoveClient(item->text());
     });
     lList->addWidget(listBtnRemove, 1, 1);
 
@@ -136,7 +136,7 @@ ClientView::ClientView (QWidget *parent)
     connect(confBtnSave, &QPushButton::clicked, this, [&]{
         QListWidgetItem *item = listView->currentItem();
         if (item)
-            saveClient(item->text());
+            sigSaveClient(item->text());
     });
     lConfBtns->addWidget(confBtnSave);
 
@@ -145,7 +145,7 @@ ClientView::ClientView (QWidget *parent)
     connect(confBtnReset, &QPushButton::clicked, this, [&]{
         QListWidgetItem *item = listView->currentItem();
         if (item)
-            selectClient(item->text());
+            sigSelectClient(item->text());
     });
     lConfBtns->addWidget(confBtnReset);
 
@@ -154,7 +154,7 @@ ClientView::ClientView (QWidget *parent)
     connect(confBtnPair, &QPushButton::clicked, this, [&]{
         QListWidgetItem *item = listView->currentItem();
         if (item)
-            openPairWindow(item->text());
+            sigOpenPairWindow(item->text());
     });
     lConfBtns->addWidget(confBtnPair);
 
@@ -163,7 +163,7 @@ ClientView::ClientView (QWidget *parent)
     connect(confBtnReset, &QPushButton::clicked, this, [&]{
         QListWidgetItem *item = listView->currentItem();
         if (item)
-            disconnectClient(item->text());
+            sigDisconnectClient(item->text());
     });
     lConfBtns->addWidget(confBtnDisconnect);
 

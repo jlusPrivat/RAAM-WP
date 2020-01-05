@@ -62,7 +62,7 @@ private slots:
     void parseOpenRequest();
     // settings view
     void checkForUpdates();
-    void updateSettings();
+    void saveSettings();
     void resetSettings();
     // client view
     void addNewClient();
