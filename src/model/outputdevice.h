@@ -16,22 +16,41 @@ DEFINE_PROPERTYKEY(PKEY_Device_DeviceDesc, 0xa45c254e, 0xdf1c, \
                    // DEVPROP_TYPE_STRING
 
 
+
+/**
+ * \brief The OutputDevice class
+ *
+ * An OutputDevice is the model equivalent of the ms
+ * Audio Endpoint Device. It therefore enables to
+ * get some properties and set mute and volume.
+ */
 class OutputDevice: public QObject {
     Q_OBJECT
 
 
 public:
+    /**
+     * passed endpoint device must be released by the owner
+     * after calling constructor. Does nothing but to keep
+     * own reference
+     */
     OutputDevice(IMMDevice*, QObject* = nullptr);
+
     ~OutputDevice();
+    /// returns the last status issued by the ms core apis
     HRESULT getInternalStatus();
     bool compareEndpointId(LPCWSTR);
     bool getIsDefaultOutput();
+    /// only internal model
     void setIsDefaultOutput(bool);
+    /// only internal model
     void setState(DWORD);
+    /// only internal model
     void updateProperty(const PROPERTYKEY);
 
 
 signals:
+    /// sent, whenever an api error occured
     void sigInternalStatusError(HRESULT);
     void sigEndpointIdChanged(LPCWSTR);
     void sigStatusChanged(const DWORD*);

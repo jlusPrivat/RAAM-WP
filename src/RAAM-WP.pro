@@ -41,9 +41,9 @@ HEADERS += \
     view/settingsview.h
 
 LIBS += \
-    "$$PWD\..\libs\Ole32.Lib" \
-    "$$PWD\..\libs\mmdevapi.lib" \
-    "$$PWD\..\libs\Uuid.Lib"
+    "$$PWD\..\resources\libs\Ole32.Lib" \
+    "$$PWD\..\resources\libs\mmdevapi.lib" \
+    "$$PWD\..\resources\libs\Uuid.Lib"
 
 RESOURCES += \
     "$$PWD\..\resources\resources.qrc"
@@ -53,8 +53,4 @@ TRANSLATIONS += \
     "$$PWD\..\resources\translations\raam-wp_de.ts"
 
 RC_ICONS = "$$PWD\..\resources\imgs\logo.ico"
-
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+VERSION = 0.0.0.0

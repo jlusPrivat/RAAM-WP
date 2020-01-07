@@ -8,6 +8,13 @@
 #include "model/outputdevice.h"
 
 
+
+/**
+ * \brief The AudioManager class
+ *
+ * Manages and creates all OutputDevices, AudioSessionGroups and AudioSessions.
+ * Notifies about all changes in the audio system.
+ */
 class AudioManager: public QObject, IMMNotificationClient {
     Q_OBJECT
 

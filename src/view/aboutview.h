@@ -9,6 +9,11 @@
 
 
 
+/**
+ * \brief The AboutView class
+ *
+ * Only for displaying the about tab of this application
+ */
 class AboutView: public QScrollArea {
     Q_OBJECT
 

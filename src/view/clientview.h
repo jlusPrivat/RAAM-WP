@@ -16,6 +16,11 @@
 
 
 
+/**
+ * \brief The ClientView class
+ *
+ * Displaying all clients and its configurations
+ */
 class ClientView: public QScrollArea {
     Q_OBJECT
 

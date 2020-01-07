@@ -6,6 +6,12 @@
 
 
 
+/**
+ * \brief The Language struct
+ *
+ * Keeps an enumeration of all available languages and
+ * is aware of the current setting.
+ */
 struct  Language {
     Language(QString, QString, bool);
     static QList<Language*> languages;
