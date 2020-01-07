@@ -18,7 +18,7 @@ AboutView::AboutView (QWidget *parent)
 
     QLabel *image = new QLabel(this);
     image->setAlignment(Qt::AlignTop);
-    image->setMargin(20);
+    image->setContentsMargins(20, 20, 20, 20);
     layout->addWidget(image);
     QPixmap pm(":/imgs/logo.png");
     image->setPixmap(pm);

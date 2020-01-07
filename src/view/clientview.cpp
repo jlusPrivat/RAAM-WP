@@ -3,25 +3,17 @@
 
 
 ClientView::ClientView (QWidget *parent)
-    : QScrollArea(parent) {
+    : QWidget(parent) {
     // config the main widget
     setBackgroundRole(QPalette::Light);
-    setFrameShape(QFrame::NoFrame);
-    setWidgetResizable(true);
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-
-    // configure the layout
-    QWidget *centralWidget = new QWidget(this);
-    setWidget(centralWidget);
-    QHBoxLayout *layout = new QHBoxLayout(centralWidget);
+    QHBoxLayout *layout = new QHBoxLayout(this);
 
 
     // add the list widget
     QWidget *wList = new QWidget(this);
     layout->addWidget(wList);
     QGridLayout *lList = new QGridLayout(wList);
-    lList->setMargin(0);
+    lList->setContentsMargins(0, 0, 0, 0);
 
     // add the list view
     listView = new QListWidget(this);
@@ -55,18 +47,32 @@ ClientView::ClientView (QWidget *parent)
     lList->addWidget(listBtnRemove, 1, 1);
 
 
+    // add the right sided scrollbar
+    QScrollArea *wConfScroll = new QScrollArea(this);
+    wConfScroll->setFrameShape(QFrame::NoFrame);
+    wConfScroll->setWidgetResizable(true);
+    wConfScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    wConfScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    layout->addWidget(wConfScroll);
+    QVBoxLayout *lConfScroll = new QVBoxLayout(wConfScroll);
+
+    // add the right sided dialog
+    QGroupBox *wConfBox = new QGroupBox(wConfScroll);
+    wConfBox->setTitle(tr("Client configuration"));
+    wConfScroll->setWidget(wConfBox);
+
     // add the conf box
-    confBox = new QGroupBox(this);
-    layout->addWidget(confBox);
-    confBox->setTitle(tr("Client configuration"));
-    QFormLayout *confLayout = new QFormLayout(confBox);
-    confLayout->setSpacing(12);
+    wConfDiag = new QDialog(wConfBox);
+    lConfScroll->addWidget(wConfDiag);
+    QFormLayout *lConfDiag = new QFormLayout(wConfDiag);
+    lConfDiag->setSpacing(12);
+    lConfDiag->setContentsMargins(4, 12, 4, 4);
 
     // add client ID and its icon
-    QWidget *wConfClientId = new QWidget(confBox);
-    confLayout->addRow(tr("Client ID:"), wConfClientId);
+    QWidget *wConfClientId = new QWidget(wConfDiag);
+    lConfDiag->addRow(tr("Client ID:"), wConfClientId);
     QHBoxLayout *lConfClientId = new QHBoxLayout(wConfClientId);
-    lConfClientId->setMargin(0);
+    lConfClientId->setContentsMargins(0, 0, 0, 0);
     // client id field
     confClientId = new QLineEdit(wConfClientId);
     confClientId->setValidator(new ClientIdValidator(this));
@@ -87,36 +93,36 @@ ClientView::ClientView (QWidget *parent)
     });
 
     // add active
-    confActive = new QCheckBox(confBox);
+    confActive = new QCheckBox(wConfDiag);
     confActive->setText(tr("If not set, the client will not be able to pair"));
-    confLayout->addRow(tr("Enabled:"), confActive);
+    lConfDiag->addRow(tr("Enabled:"), confActive);
 
     // add description
-    confDescription = new QPlainTextEdit(confBox);
+    confDescription = new QPlainTextEdit(wConfDiag);
     confDescription->setFixedHeight(60);
-    confLayout->addRow(tr("Description:"), confDescription);
+    lConfDiag->addRow(tr("Description:"), confDescription);
 
     // add ask before connecting
-    confAskPairing = new QCheckBox(confBox);
+    confAskPairing = new QCheckBox(wConfDiag);
     confAskPairing->setText(tr("Ask before pairing"));
-    confLayout->addRow(tr("Ask Pairing:"), confAskPairing);
+    lConfDiag->addRow(tr("Ask Pairing:"), confAskPairing);
 
     // add notification upon pairing
-    confShowNotification = new QCheckBox(confBox);
+    confShowNotification = new QCheckBox(wConfDiag);
     confShowNotification->setText(tr("Show notification when pairing"));
-    confLayout->addRow(tr("Notify Pairing:"), confShowNotification);
+    lConfDiag->addRow(tr("Notify Pairing:"), confShowNotification);
 
     // add only plugged in devices
-    confOnlyPluggedIn = new QCheckBox(confBox);
+    confOnlyPluggedIn = new QCheckBox(wConfDiag);
     confOnlyPluggedIn->setText(tr("Only plugged in Audio Endpoints will be visible"));
-    confLayout->addRow(tr("Only Plugged:"), confOnlyPluggedIn);
+    lConfDiag->addRow(tr("Only Plugged:"), confOnlyPluggedIn);
 
 
     // add the right sided buttons
-    QWidget *wConfBtns = new QWidget(confBox);
+    QWidget *wConfBtns = new QWidget(wConfDiag);
     QHBoxLayout *lConfBtns = new QHBoxLayout(wConfBtns);
-    lConfBtns->setMargin(0);
-    confLayout->addRow(wConfBtns);
+    lConfBtns->setContentsMargins(0, 0, 0, 0);
+    lConfDiag->addRow(wConfBtns);
 
     // the save button
     confBtnSave = new QPushButton(tr("Save"), wConfBtns);
@@ -168,7 +174,7 @@ ClientView::ClientView (QWidget *parent)
     lConfBtns->addWidget(confBtnDisconnect);
 
     // disable the entire boxgroup
-    confBox->setDisabled(true);
+    wConfDiag->setDisabled(true);
 }
 
 

@@ -13,7 +13,7 @@ MainWindow::MainWindow (QWidget *parent)
     QWidget *centralWidget = new QWidget(this);
     QGridLayout *centralLayout = new QGridLayout(centralWidget);
     QTabWidget *tabBar = new QTabWidget(centralWidget);
-    centralLayout->setMargin(5);
+    centralLayout->setContentsMargins(5, 5, 5, 5);
     centralLayout->addWidget(tabBar);
     setCentralWidget(centralWidget);
 

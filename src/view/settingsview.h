@@ -1,6 +1,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include <QDialog>
 #include <QScrollArea>
 #include <QFormLayout>
 #include <QLabel>
@@ -18,7 +19,7 @@
 /**
  * \brief SettingsView presents the configuration to the user
 */
-class SettingsView: public QWidget {
+class SettingsView: public QDialog {
     Q_OBJECT
 
 

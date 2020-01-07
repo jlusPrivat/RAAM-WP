@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QScrollArea>
+#include <QDialog>
 #include <QGroupBox>
 #include <QListWidget>
 #include <QHBoxLayout>
@@ -21,7 +22,7 @@
  *
  * Displaying all clients and its configurations
  */
-class ClientView: public QScrollArea {
+class ClientView: public QWidget {
     Q_OBJECT
 
 
@@ -33,7 +34,7 @@ public:
     QPushButton *listBtnAdd = nullptr;
     QPushButton *listBtnRemove = nullptr;
 
-    QGroupBox *confBox = nullptr;
+    QDialog *wConfDiag = nullptr;
     QLineEdit *confClientId = nullptr;
     QCheckBox *confActive = nullptr;
     QPlainTextEdit *confDescription = nullptr;

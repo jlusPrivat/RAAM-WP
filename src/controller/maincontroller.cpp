@@ -360,7 +360,7 @@ void MainController::selectClient (QString id) {
 
     // set fields enabled
     cw->listBtnRemove->setDisabled(false);
-    cw->confBox->setDisabled(false);
+    cw->wConfDiag->setDisabled(false);
     cw->confBtnSave->setDisabled(true);
     cw->confBtnPair->setDisabled(client->isPaired());
     cw->confBtnDisconnect->setEnabled(client->isPaired());
@@ -381,7 +381,7 @@ void MainController::unselectClient () {
 
     // set fields disabled
     cw->listBtnRemove->setDisabled(true);
-    cw->confBox->setDisabled(true);
+    cw->wConfDiag->setDisabled(true);
 }
 
 

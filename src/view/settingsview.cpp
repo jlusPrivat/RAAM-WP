@@ -3,7 +3,7 @@
 
 
 SettingsView::SettingsView (QWidget *parent)
-    : QWidget(parent) {
+    : QDialog(parent) {
     // config the main widget
     setBackgroundRole(QPalette::Light);
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -26,7 +26,7 @@ SettingsView::SettingsView (QWidget *parent)
     lForm->addRow(tr("Server-ID:"), wServerId);
     QHBoxLayout *lServerId = new QHBoxLayout(wServerId);
     lServerId->setAlignment(Qt::AlignLeft);
-    lServerId->setMargin(0);
+    lServerId->setContentsMargins(0, 0, 0, 0);
     // server Id field
     serverId = new QLineEdit(wServerId);
     QRegExp rx("[a-zA-Z][a-zA-Z0-9 _\\-]{1,23}[a-zA-Z0-9]");
@@ -56,7 +56,7 @@ SettingsView::SettingsView (QWidget *parent)
     QWidget *wAutostart = new QWidget(wForm);
     lForm->addRow(tr("Autostart:"), wAutostart);
     QVBoxLayout *lAutostart = new QVBoxLayout(wAutostart);
-    lAutostart->setMargin(0);
+    lAutostart->setContentsMargins(0, 0, 0, 0);
     autostartFull = new QRadioButton(wAutostart);
     autostartFull->setText(tr("Start RAAM, when logging in into windows"));
     lAutostart->addWidget(autostartFull);
@@ -90,7 +90,7 @@ SettingsView::SettingsView (QWidget *parent)
     QWidget *wUpdateCheck = new QWidget(wForm);
     lForm->addRow(tr("Update check:"), wUpdateCheck);
     QVBoxLayout *lUpdateCheck = new QVBoxLayout(wUpdateCheck);
-    lUpdateCheck->setMargin(0);
+    lUpdateCheck->setContentsMargins(0, 0, 0, 0);
     startupUpdateCheck->setText(tr("Check for updates, when the application starts"));
     lUpdateCheck->addWidget(startupUpdateCheck);
     QPushButton *buttonCheckUpdate = new QPushButton(
@@ -105,7 +105,7 @@ SettingsView::SettingsView (QWidget *parent)
     QWidget *wButtons = new QWidget(this);
     layout->addWidget(wButtons);
     QHBoxLayout *lButtons = new QHBoxLayout(wButtons);
-    lButtons->setMargin(0);
+    lButtons->setContentsMargins(0, 0, 0, 0);
 
     // save button incl. all "enable" connections
     buttonSave = new QPushButton(tr("Save"), wForm);
