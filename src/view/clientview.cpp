@@ -179,8 +179,10 @@ ClientView::ClientView (QWidget *parent)
 
 
 
-void ClientView::lstAddItem (QString id, IconType icon) {
-    new QListWidgetItem(QIcon(getIcon(icon)), id, listView);
+void ClientView::lstAddItem (QString id, Client::ConnectionState state) {
+    QListWidgetItem *item = new QListWidgetItem(QIcon(getIcon(state)),
+                                                id, listView);
+    item->setToolTip(getToolTip(state));
     listView->sortItems();
 }
 
@@ -196,25 +198,40 @@ void ClientView::lstRemoveItem (QString id) {
 
 
 
-void ClientView::updateItem (QString oldId, QString newId, IconType icon) {
+void ClientView::updateItem (QString oldId, QString newId,
+                             Client::ConnectionState state) {
     QListWidgetItem *item = getItemById(oldId);
     if (item) {
         item->setText(newId);
-        item->setIcon(QIcon(getIcon(icon)));
+        item->setIcon(QIcon(getIcon(state)));
+        item->setToolTip(getToolTip(state));
         listView->sortItems();
     }
 }
 
 
 
-QString ClientView::getIcon (IconType t) {
-    switch (t) {
-    case E_ICON_PAIRED:
+QString ClientView::getIcon (Client::ConnectionState state) {
+    switch (state) {
+    case Client::E_PAIRED:
         return ":/imgs/paired-icon.png";
-    case E_ICON_ACTIVE:
+    case Client::E_ACTIVE:
         return ":/imgs/active-icon.png";
     default:
         return ":/imgs/inactive-icon.png";
+    }
+}
+
+
+
+QString ClientView::getToolTip (Client::ConnectionState state) {
+    switch (state) {
+    case Client::E_PAIRED:
+        return tr("Paired");
+    case Client::E_ACTIVE:
+        return tr("Waiting for pairing");
+    default:
+        return tr("Inactive");
     }
 }
 

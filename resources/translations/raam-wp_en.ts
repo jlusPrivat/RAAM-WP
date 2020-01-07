@@ -88,6 +88,18 @@
 - Beginning only letters
 - No identical other client id</translation>
     </message>
+    <message>
+        <source>Paired</source>
+        <translation>Paired</translation>
+    </message>
+    <message>
+        <source>Waiting for pairing</source>
+        <translation>Waiting for pairing</translation>
+    </message>
+    <message>
+        <source>Inactive</source>
+        <translation>Inactive</translation>
+    </message>
 </context>
 <context>
     <name>MainController</name>

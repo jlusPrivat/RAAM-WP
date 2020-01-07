@@ -79,6 +79,16 @@ void Client::setId (QString id) {
 
 
 
+Client::ConnectionState Client::getConnectionState() {
+    if (isPaired())
+        return E_PAIRED;
+    else if (isActive())
+        return E_ACTIVE;
+    return E_INACTIVE;
+}
+
+
+
 bool Client::isActive () {
     return active;
 }

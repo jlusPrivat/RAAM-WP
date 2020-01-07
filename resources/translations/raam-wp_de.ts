@@ -88,6 +88,18 @@
 - Nur mit Buchstaben beginnen
 - Keine anderen gleichen Client IDs</translation>
     </message>
+    <message>
+        <source>Paired</source>
+        <translation>Verbunden</translation>
+    </message>
+    <message>
+        <source>Waiting for pairing</source>
+        <translation>Warten auf Verbindung</translation>
+    </message>
+    <message>
+        <source>Inactive</source>
+        <translation>Inaktiv</translation>
+    </message>
 </context>
 <context>
     <name>MainController</name>

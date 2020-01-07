@@ -14,6 +14,7 @@
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QLabel>
+#include "model/client.h"
 
 
 
@@ -27,9 +28,6 @@ class ClientView: public QWidget {
 
 
 public:
-    // enumerations
-    enum IconType {E_ICON_PAIRED, E_ICON_ACTIVE, E_ICON_INACTIVE};
-
     // properties
     QPushButton *listBtnAdd = nullptr;
     QPushButton *listBtnRemove = nullptr;
@@ -48,9 +46,9 @@ public:
 
     // methods
     ClientView(QWidget* = nullptr);
-    void lstAddItem(QString, IconType);
+    void lstAddItem(QString, Client::ConnectionState);
     void lstRemoveItem(QString);
-    void updateItem(QString, QString, IconType);
+    void updateItem(QString, QString, Client::ConnectionState);
 
 
 signals:
@@ -70,7 +68,8 @@ private:
 
     // methods
     QListWidgetItem* getItemById(QString);
-    QString getIcon(IconType);
+    static QString getIcon(Client::ConnectionState);
+    static QString getToolTip(Client::ConnectionState);
 
     // nested classes
     class ClientIdValidator: public QRegExpValidator {

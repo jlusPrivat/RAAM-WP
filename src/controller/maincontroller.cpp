@@ -58,7 +58,7 @@ MainController::MainController (QObject *parent)
         Client *newClient = new Client(clientName, qSettings, this);
         newClient->loadConfig();
         clients.append(newClient);
-        w->clientTab->lstAddItem(clientName, determineClientIcon(newClient));
+        w->clientTab->lstAddItem(clientName, newClient->getConnectionState());
     }
 
     // show the tray icon
@@ -138,16 +138,6 @@ Client* MainController::getClientById (QString id) {
             return ce;
     }
     return nullptr;
-}
-
-
-
-ClientView::IconType MainController::determineClientIcon (Client* client) {
-    if (client->isPaired())
-        return ClientView::E_ICON_PAIRED;
-    else if (client->isActive())
-        return ClientView::E_ICON_ACTIVE;
-    return ClientView::E_ICON_INACTIVE;
 }
 
 
@@ -318,7 +308,7 @@ void MainController::addNewClient () {
     QString newName = newNameBase;
     while (getClientById(newName))
         newName = QStringLiteral("%1 %2").arg(newNameBase).arg(newNameNum++);
-    w->clientTab->lstAddItem(newName, ClientView::E_ICON_INACTIVE);
+    w->clientTab->lstAddItem(newName, Client::E_INACTIVE);
 
     // generate a new client
     Client *newClient = new Client(newName, qSettings, this);
@@ -407,7 +397,7 @@ void MainController::saveClient (QString id) {
     client->saveConfig();
 
     // update the listview, if needed
-    cw->updateItem(id, client->getId(), determineClientIcon(client));
+    cw->updateItem(id, client->getId(), client->getConnectionState());
 
     // disable the save field
     cw->confBtnSave->setDisabled(true);
@@ -429,5 +419,5 @@ void MainController::disconnectClient (QString id) {
     cw->confBtnPair->setDisabled(false);
     cw->confBtnDisconnect->setDisabled(true);
     // update icon
-    cw->updateItem(id, id, determineClientIcon(client));
+    cw->updateItem(id, id, client->getConnectionState());
 }

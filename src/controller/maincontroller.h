@@ -72,8 +72,6 @@ private:
     void writeSetting(Settingskey, QVariant);
     /// Gets a pointer to a Client by its ID. Returns null, if not exist.
     Client* getClientById(QString);
-    /// Determines the Icon for representing the clients state
-    ClientView::IconType determineClientIcon(Client*);
 
 
 private slots:

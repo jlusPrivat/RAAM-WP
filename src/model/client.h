@@ -33,6 +33,9 @@ public:
     enum Connectionerror {
     };
 
+    // enumerations
+    enum ConnectionState {E_PAIRED, E_ACTIVE, E_INACTIVE};
+
     // properties
     QString description;
     bool askBeforeConnect = false;
@@ -50,6 +53,7 @@ public:
     void removeFromConfig();
     QString getId();
     void setId(QString);
+    ConnectionState getConnectionState();
     bool isActive();
     void setActive(bool);
     bool isOnlyPluggedInDevices();
