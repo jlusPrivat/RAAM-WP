@@ -24,6 +24,7 @@ void Client::saveConfig () {
     qSettings->setValue("askBeforeConnect", askBeforeConnect);
     qSettings->setValue("showNotificationOnConnect", showNotificationOnConnect);
     qSettings->setValue("onlyPluggedInDevices", onlyPluggedInDevices);
+    qSettings->setValue("secretKey", secretKey);
     qSettings->endGroup();
 
     // remove old entry
@@ -46,6 +47,7 @@ void Client::loadConfig () {
                                                  true).toBool();
     onlyPluggedInDevices = qSettings->value("onlyPluggedInDevices",
                                             true).toBool();
+    secretKey = qSettings->value("secretKey").toByteArray();
     qSettings->endGroup();
 }
 
@@ -55,6 +57,25 @@ void Client::removeFromConfig () {
     QString key = QStringLiteral("clients/%1").arg(origClientId.isEmpty()
                                                    ? clientId : origClientId);
     qSettings->remove(key);
+}
+
+
+
+void Client::generateSecretKey () {
+    QRandomGenerator *gen = QRandomGenerator::system();
+    secretKey.clear();
+    secretKey.resize(64);
+    for (int dword = 0; dword < 8; dword++) {
+        quint64 w = gen->generate64();
+        for (int byte = 0; byte < 8; byte++)
+            secretKey[(dword*8)+byte] = (w >> ((8-byte)*8)) & 0xFF;
+    }
+}
+
+
+
+QByteArray Client::getSecretKey () {
+    return secretKey;
 }
 
 

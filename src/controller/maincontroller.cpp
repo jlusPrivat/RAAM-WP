@@ -45,6 +45,8 @@ MainController::MainController (QObject *parent)
             this, &MainController::unselectClient);
     connect(w->clientTab, &ClientView::sigSaveClient,
             this, &MainController::saveClient);
+    connect(w->clientTab, &ClientView::sigOpenPairWindow,
+            this, &MainController::openPairWindow);
     connect(w->clientTab, &ClientView::sigDisconnectClient,
             this, &MainController::disconnectClient);
 
@@ -313,6 +315,7 @@ void MainController::addNewClient () {
     // generate a new client
     Client *newClient = new Client(newName, qSettings, this);
     newClient->setActive(false);
+    newClient->generateSecretKey();
     newClient->saveConfig();
     clients.append(newClient);
 }
@@ -401,6 +404,43 @@ void MainController::saveClient (QString id) {
 
     // disable the save field
     cw->confBtnSave->setDisabled(true);
+}
+
+
+
+void MainController::openPairWindow (QString id) {
+    Client *client = getClientById(id);
+    if (!client) {
+        unselectClient();
+        return;
+    }
+
+    PairingWindow *pw = new PairingWindow(w);
+
+    // set server id
+    pw->wServerId->setText(readSetting(E_SERVERID).toString());
+
+    // set server ip
+    QString serverIp = tr("Not connected");
+    const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
+    for (const QHostAddress &address: QNetworkInterface::allAddresses()) {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost)
+              serverIp = address.toString();
+    }
+    pw->wServerIp->setText(serverIp);
+
+    // set server port
+    pw->wServerPort->setText(readSetting(E_PORT).toString());
+
+    // set client secret
+    pw->wClientSecret->setText(client->getSecretKey().toBase64());
+
+    // set client id
+    pw->setClientId(id);
+
+    // display
+    pw->generateQr("!!!QRTEST");
+    pw->show();
 }
 
 

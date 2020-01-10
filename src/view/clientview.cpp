@@ -62,7 +62,7 @@ ClientView::ClientView (QWidget *parent)
     wConfScroll->setWidget(wConfBox);
 
     // add the conf box
-    wConfDiag = new QDialog(wConfBox);
+    wConfDiag = new QWidget(wConfBox);
     lConfScroll->addWidget(wConfDiag);
     QFormLayout *lConfDiag = new QFormLayout(wConfDiag);
     lConfDiag->setSpacing(12);

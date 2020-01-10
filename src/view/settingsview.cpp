@@ -3,7 +3,7 @@
 
 
 SettingsView::SettingsView (QWidget *parent)
-    : QDialog(parent) {
+    : QWidget(parent) {
     // config the main widget
     setBackgroundRole(QPalette::Light);
     QVBoxLayout *layout = new QVBoxLayout(this);

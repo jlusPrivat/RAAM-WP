@@ -25,6 +25,7 @@ SOURCES += \
     view/clientview.cpp \
     view/mainwindow.cpp \
     model/audiomanager.cpp \
+    view/pairingwindow.cpp \
     view/settingsview.cpp
 
 HEADERS += \
@@ -38,6 +39,7 @@ HEADERS += \
     model/audiomanager.h \
     utils/SafeRelease.h \
     utils/makros.h \
+    view/pairingwindow.h \
     view/settingsview.h
 
 LIBS += \

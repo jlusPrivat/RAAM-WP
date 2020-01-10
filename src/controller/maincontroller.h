@@ -9,6 +9,7 @@
 #include "controller/language.h"
 #include "model/client.h"
 #include "view/mainwindow.h"
+#include "view/pairingwindow.h"
 
 
 
@@ -103,7 +104,7 @@ private slots:
     /// saves client configuration as in the view
     void saveClient(QString);
     /// displays a window for the pairing information
-    //void openPairWindow(QString);
+    void openPairWindow(QString);
     /// disconnects a client from this server
     void disconnectClient(QString);
 

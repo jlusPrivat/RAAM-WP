@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QSettings>
+#include <QRandomGenerator>
 #include <QTcpSocket>
 
 
@@ -23,6 +24,7 @@
  * askBeforeConnect             false   true, false
  * showNotificationOnConnect    true    true, false
  * onlyPluggedInDevices         true    true, false
+ * secretKey                    ""      64-byte Byte array
  * */
 class Client: public QObject {
     Q_OBJECT
@@ -51,6 +53,8 @@ public:
     void loadConfig();
     /// removes this client from permanent storage.
     void removeFromConfig();
+    void generateSecretKey();
+    QByteArray getSecretKey();
     QString getId();
     void setId(QString);
     ConnectionState getConnectionState();
@@ -83,6 +87,7 @@ private:
     bool active = true;
     QTcpSocket *currentParing = nullptr;
     bool onlyPluggedInDevices = true;
+    QByteArray secretKey;
 
 
 };

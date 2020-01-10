@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QScrollArea>
-#include <QDialog>
 #include <QGroupBox>
 #include <QListWidget>
 #include <QHBoxLayout>
@@ -32,7 +31,7 @@ public:
     QPushButton *listBtnAdd = nullptr;
     QPushButton *listBtnRemove = nullptr;
 
-    QDialog *wConfDiag = nullptr;
+    QWidget *wConfDiag = nullptr;
     QLineEdit *confClientId = nullptr;
     QCheckBox *confActive = nullptr;
     QPlainTextEdit *confDescription = nullptr;
