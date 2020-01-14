@@ -120,6 +120,10 @@
         <extracomment>Translation must obey the rules for client ids</extracomment>
         <translation>neuer client</translation>
     </message>
+    <message>
+        <source>Not connected</source>
+        <translation>Nicht verbunden</translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
@@ -166,6 +170,45 @@
     <message>
         <source>Clients</source>
         <translation>Clients</translation>
+    </message>
+</context>
+<context>
+    <name>PairingWindow</name>
+    <message>
+        <source>Pair using Qr Code</source>
+        <translation>Pair mit Qr Code</translation>
+    </message>
+    <message>
+        <source>Pair using raw information</source>
+        <translation>Pair mit Rohdaten</translation>
+    </message>
+    <message>
+        <source>Use the information below to manually connect to this server using your client device. You can copy all fields.</source>
+        <translation>Nutze die unten stehenden Informationen zur Eingabe, um dich manuell mit diesem Server zu verbinden. Sie können Felder kopieren und in der Client Software eintragen.</translation>
+    </message>
+    <message>
+        <source>Server ID:</source>
+        <translation>Server ID:</translation>
+    </message>
+    <message>
+        <source>Client IP:</source>
+        <translation>Client IP:</translation>
+    </message>
+    <message>
+        <source>Server Port:</source>
+        <translation>Server Port:</translation>
+    </message>
+    <message>
+        <source>Client ID:</source>
+        <translation>Client ID:</translation>
+    </message>
+    <message>
+        <source>Client Secret:</source>
+        <translation>Client Secret:</translation>
+    </message>
+    <message>
+        <source>Paring configuration for &quot;%1&quot;</source>
+        <translation>Pairing Konfiguration für &quot;%1&quot;</translation>
     </message>
 </context>
 <context>

@@ -1,8 +1,11 @@
-# Server Command Guide
+# Server Commands
 This guide describes the usage of the RAAM-WP tcp socket server.
 It therefore helps implementing applications, that employs the network
 functionalities provided by this program.
 
+**Note, that any application using the RAAM server commands, partially or as a whole, must be licensed under GNU General Public License v3.0**
+
+**Note, that all specs descriped here are still pending and should not be used for development. This line will be removed, as soon, as the specs are ready to use.**
 
 ## Pairing Client and Server
 When a client (like Smartphone) wants to connect to a server (like Windows PC),
@@ -12,38 +15,38 @@ a client should provide an interface to manually input these data.
 The client can then save those connection information and use them to connect at any time.
 
 ### Reading the QR Code
-*!!! QR Code not finalized yet: Still pending*  
+Any suitable error correction level is allowed.  
 The QR Code contains these information in this exact order.  
-* Server Name (Null terminated ascii character string; Max 100 characters; RegEx: [a-zA-Z][a-zA-Z0-9 _\-]{1,23}[a-zA-Z0-9])
+* Server ID (Null terminated ascii character string; Max 25 characters; RegEx: [a-zA-Z][a-zA-Z0-9 _\-]{1,23}[a-zA-Z0-9])
 * Server Software (Null terminated, ascii character string representing the name of the software e.g. "RAAM-WP")
-* Server RAAM software version. (Null terminated, ascii character string; Semantic Versioning)
-* Server IP adress (4x ascii bit integer in left-to-right order; Big Endian style)
+* Server software version. (Null terminated, ascii character string; Semantic Versioning)
+* Server IP adress (4x 8 bit unsigned integer in left-to-right order; Big Endian style; Only IPv4)
 * Server port (unsigned 16 bit integer, range 1024..65535)
-* Client ID (Null terminated ascii character string; Max 100 characters; RegEx: [a-z][a-z0-9 _\\-]{1,23}[a-z0-9])
-* Client specific hmac shared secret (64 Bytes; Big Endian)
+* Client ID (Null terminated ascii character string; Max 25 characters; RegEx: [a-z][a-z0-9 _\\-]{1,23}[a-z0-9])
+* Client specific hmac shared secret (64 Bytes)
 
 
 ## Establishing a connection
-### About TCP messages
+### About TCP/BLE messages
 * Following specifications describe both ways of communication.
-* TCP messages consist of Null terminated 2 byte Wide Character Strings.
-* Every tcp message is key-value based in form of: `key1="value1";key2="value2"` for every type of value. Exceptions are error messages.
+* TCP / BLE messages consist of Null terminated 2 byte Wide Character Strings.
+* Every TCP/BLE message is key-value based in form of: `key1="value1";key2="value2"` for every type of value. Exceptions are error messages.
 * Values containing a `"` character are prohibited and lead to the message being rejected.
-* Every Message has to have the 32 bytes of the HMAC (using sha256) appended in raw binary form. The HMAC is generated from the entire message, excluding only the HMAC itself. If the HMAC is wrong, "WRONG_HAMAC" will be returned.
+* Every Message has to have the 32 bytes of the HMAC (using sha256) appended in raw binary form. The HMAC is generated from the entire message, excluding only the HMAC itself. If the HMAC is wrong, "WRONG_HMAC" will be returned.
 * Rejected messages will be fully ignored, unless a specific error message is returned.
-
-### About connecting
-1. Connect to the server using its IP adress and the correct port
-2. *!!! No further specification yet*
+* Furhter rules regarding the messages must be extracted from the following section.
 
 
 ## About Keys and Actions
 ### Overview of all actions
-* **init**: *!!! No description yet*
+* **init**: Must be issued by the client within 10 seconds after establishing a transport layer connection using the servers IP adress and port. *!!! No further description yet*
+* **unknown**: This action is sent, when any correspondent does 
 * **close**: *!!! No description yet*
 * **changeServerId**: *!!! No description yet*
 * **changeClientId**: *!!! No description yet*
 * **info**: *!!! No description yet*
+* **devices**: *!!! No description yet*
+* **sessions**: *!!! No description yet*
 
 ### Overview of all possible keys
 Key | Description
