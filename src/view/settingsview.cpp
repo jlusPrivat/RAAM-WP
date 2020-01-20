@@ -100,6 +100,11 @@ SettingsView::SettingsView (QWidget *parent)
     buttonCheckUpdate->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     lUpdateCheck->addWidget(buttonCheckUpdate);
 
+    // debug mode
+    debugMode = new QCheckBox(wForm);
+    debugMode->setText(tr("Do not check HMACs of client transmissions"));
+    lForm->addRow(tr("Debug mode:"), debugMode);
+
 
     // buttons at the end
     QWidget *wButtons = new QWidget(this);
@@ -127,6 +132,8 @@ SettingsView::SettingsView (QWidget *parent)
             this, [&]{buttonSave->setDisabled(false);});
     connect(startupUpdateCheck, &QCheckBox::stateChanged,
             this, [&]{buttonSave->setDisabled(false);});
+    connect(debugMode, &QCheckBox::stateChanged,
+            this, [&]{buttonSave->setDisabled(false);});
     buttonSave->setDefault(true);
     lButtons->addWidget(buttonSave);
 
@@ -144,4 +151,13 @@ SettingsView::SettingsView (QWidget *parent)
     buttonClose->setToolTip(tr("Fully close the application (no tray)"));
     buttonClose->setStyleSheet("color: red;");
     lButtons->addWidget(buttonClose);
+}
+
+
+
+void SettingsView::keyPressEvent (QKeyEvent *event) {
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+        buttonSave->click();
+        event->accept();
+    }
 }

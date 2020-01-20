@@ -101,6 +101,8 @@ QVariant MainController::readSetting (Settingskey key) {
         return qSettings->value("port", 1030);
     case E_STARTUPUDATECHECK:
         return qSettings->value("startupupdatecheck", true);
+    case E_DEBUGMODE:
+        return qSettings->value("debugmode", false);
     }
     return 0;
 }
@@ -126,6 +128,9 @@ void MainController::writeSetting (Settingskey key, QVariant content) {
         break;
     case E_STARTUPUDATECHECK:
         qSettings->setValue("startupupdatecheck", content);
+        break;
+    case E_DEBUGMODE:
+        qSettings->setValue("debugmode", content);
         break;
     }
 }
@@ -248,6 +253,9 @@ void MainController::saveSettings () {
     // automatic update check
     writeSetting(E_STARTUPUDATECHECK, s->startupUpdateCheck->isChecked());
 
+    // debug mode
+    writeSetting(E_DEBUGMODE, s->debugMode->isChecked());
+
     // language
     QString newLanguage = s->language->currentData().toString();
     if (newLanguage != readSetting(E_LANGUAGE)) {
@@ -287,6 +295,9 @@ void MainController::resetSettings () {
 
     // automatic update check
     s->startupUpdateCheck->setChecked(readSetting(E_STARTUPUDATECHECK).toBool());
+
+    // debug mode
+    s->debugMode->setChecked(readSetting(E_DEBUGMODE).toBool());
 
     // language
     auto langs = Language::languages;

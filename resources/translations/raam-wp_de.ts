@@ -289,5 +289,13 @@
 - Nur Zahlen, Buchstaben, Leerzeichen oder Unterstrich
 - Nur mit Buchstaben beginnen</translation>
     </message>
+    <message>
+        <source>Do not check HMACs of client transmissions</source>
+        <translation>Keine Überprüfung der HMACs von Clients Übertragungen</translation>
+    </message>
+    <message>
+        <source>Debug mode:</source>
+        <translation>Debug Modus:</translation>
+    </message>
 </context>
 </TS>

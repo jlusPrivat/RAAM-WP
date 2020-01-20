@@ -289,5 +289,13 @@
 - Only alphanumeric, space and underscore
 - Beginning only letters</translation>
     </message>
+    <message>
+        <source>Do not check HMACs of client transmissions</source>
+        <translation>Do not check HMACs of client transmissions</translation>
+    </message>
+    <message>
+        <source>Debug mode:</source>
+        <translation>Debug mode:</translation>
+    </message>
 </context>
 </TS>

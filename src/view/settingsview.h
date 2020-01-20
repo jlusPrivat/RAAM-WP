@@ -44,6 +44,7 @@ public:
     QSpinBox *port = nullptr;
     QComboBox *language = nullptr;
     QCheckBox *startupUpdateCheck = nullptr;
+    QCheckBox *debugMode = nullptr;
     QPushButton *buttonSave = nullptr;
 
 
@@ -59,6 +60,7 @@ signals:
 
 
 private:
+    void keyPressEvent(QKeyEvent *event) override;
     QLabel *warningServerId = nullptr;
 
 

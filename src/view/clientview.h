@@ -67,6 +67,7 @@ private:
 
     // methods
     QListWidgetItem* getItemById(QString);
+    void keyPressEvent(QKeyEvent *event) override;
     static QString getIcon(Client::ConnectionState);
     static QString getToolTip(Client::ConnectionState);
 

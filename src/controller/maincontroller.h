@@ -31,13 +31,14 @@
  *  autostart               "tray"          "tray", "full", "none"
  *  port                    1030            1024 - 65535
  *  startupupdatecheck      true            true, false
+ *  debugmode               false           true, false
 */
 class MainController: public QObject {
     Q_OBJECT
 private:
     enum Settingskey {
         E_LANGUAGE, E_SERVERID, E_KEEPINTRAY, E_AUTOSTART, E_PORT,
-        E_STARTUPUDATECHECK
+        E_STARTUPUDATECHECK, E_DEBUGMODE
     };
 
 

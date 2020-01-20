@@ -211,6 +211,15 @@ void ClientView::updateItem (QString oldId, QString newId,
 
 
 
+void ClientView::keyPressEvent (QKeyEvent *event) {
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+        confBtnSave->click();
+        event->accept();
+    }
+}
+
+
+
 QString ClientView::getIcon (Client::ConnectionState state) {
     switch (state) {
     case Client::E_PAIRED:
