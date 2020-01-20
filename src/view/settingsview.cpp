@@ -100,6 +100,20 @@ SettingsView::SettingsView (QWidget *parent)
     buttonCheckUpdate->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     lUpdateCheck->addWidget(buttonCheckUpdate);
 
+    // tcp and ble enabled
+    QWidget *wServiceEnabled = new QWidget(wForm);
+    lForm->addRow(tr("Enabled Services:"), wServiceEnabled);
+    QVBoxLayout *lServiceEnabled = new QVBoxLayout(wServiceEnabled);
+    lServiceEnabled->setContentsMargins(0, 0, 0, 0);
+    tcpEnabled = new QCheckBox(wServiceEnabled);
+    tcpEnabled->setText(tr("TCP Server (recommended)"));
+    lServiceEnabled->addWidget(tcpEnabled);
+    bleEnabled = new QCheckBox(wServiceEnabled);
+    bleEnabled->setText(tr("Bluetooth low energy (recommended)"));
+    bleEnabled->setDisabled(true);
+    bleEnabled->setToolTip(tr("BLE not implemented yet"));
+    lServiceEnabled->addWidget(bleEnabled);
+
     // debug mode
     debugMode = new QCheckBox(wForm);
     debugMode->setText(tr("Do not check HMACs of client transmissions"));
@@ -131,6 +145,10 @@ SettingsView::SettingsView (QWidget *parent)
     connect(language, &QComboBox::currentTextChanged,
             this, [&]{buttonSave->setDisabled(false);});
     connect(startupUpdateCheck, &QCheckBox::stateChanged,
+            this, [&]{buttonSave->setDisabled(false);});
+    connect(tcpEnabled, &QCheckBox::stateChanged,
+            this, [&]{buttonSave->setDisabled(false);});
+    connect(bleEnabled, &QCheckBox::stateChanged,
             this, [&]{buttonSave->setDisabled(false);});
     connect(debugMode, &QCheckBox::stateChanged,
             this, [&]{buttonSave->setDisabled(false);});

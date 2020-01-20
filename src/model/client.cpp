@@ -143,9 +143,10 @@ bool Client::isPaired () {
 
 
 
-void Client::pair (QTcpSocket* socket) {
+void Client::pair (QTcpSocket* socket, QString initialMessage) {
     currentParing = socket;
-    // !!!
+    // !!! has to load 32 byte hmac from socket
+    // !!! Parse initial message and check for integrity of hmac
 }
 
 

@@ -291,11 +291,27 @@
     </message>
     <message>
         <source>Do not check HMACs of client transmissions</source>
-        <translation>Keine Überprüfung der HMACs von Clients Übertragungen</translation>
+        <translation>Keine Überprüfung der HMACs von Client Übertragungen</translation>
     </message>
     <message>
         <source>Debug mode:</source>
         <translation>Debug Modus:</translation>
+    </message>
+    <message>
+        <source>TCP Server (recommended)</source>
+        <translation>TCP Server (empfohlen)</translation>
+    </message>
+    <message>
+        <source>Bluetooth low energy (recommended)</source>
+        <translation>Bluetooth low energy (empfohlen)</translation>
+    </message>
+    <message>
+        <source>BLE not implemented yet</source>
+        <translation>BLE noch nicht implementiert</translation>
+    </message>
+    <message>
+        <source>Enabled Services:</source>
+        <translation>Aktivierte Dienste:</translation>
     </message>
 </context>
 </TS>

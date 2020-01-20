@@ -29,10 +29,10 @@ The QR Code contains these information in this exact order.
 ## Establishing a connection
 ### About TCP/BLE messages
 * Following specifications describe both ways of communication.
-* TCP / BLE messages consist of Null terminated 2 byte Wide Character Strings.
+* TCP / BLE messages consist of Null terminated 2 byte Wide Character Strings. (Null termination before HMAC)
 * Every TCP/BLE message is key-value based in form of: `key1="value1";key2="value2"` for every type of value. Exceptions are error messages.
 * Values containing a `"` character are prohibited and lead to the message being rejected.
-* Every Message has to have the 32 bytes of the HMAC (using sha256) appended in raw binary form. The HMAC is generated from the entire message, excluding only the HMAC itself. If the HMAC is wrong, "WRONG_HMAC" will be returned.
+* Every Message has to have the 32 bytes of the HMAC (using sha256) appended in raw binary form. The HMAC is generated from the entire message, excluding only the HMAC itself. If the HMAC is wrong, "WRONG_HMAC" will be returned. This is optional, when debug mode is enabled.
 * Rejected messages will be fully ignored, unless a specific error message is returned.
 * Furhter rules regarding the messages must be extracted from the following section.
 

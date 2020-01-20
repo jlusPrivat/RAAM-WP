@@ -74,7 +74,7 @@ signals:
 
 
 public slots:
-    void pair(QTcpSocket*);
+    void pair(QTcpSocket*, QString);
     /// will properly close the connection
     void unpair();
 

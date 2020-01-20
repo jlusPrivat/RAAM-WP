@@ -297,5 +297,21 @@
         <source>Debug mode:</source>
         <translation>Debug mode:</translation>
     </message>
+    <message>
+        <source>TCP Server (recommended)</source>
+        <translation>TCP Server (recommended)</translation>
+    </message>
+    <message>
+        <source>Bluetooth low energy (recommended)</source>
+        <translation>Bluetooth low energy (recommended)</translation>
+    </message>
+    <message>
+        <source>BLE not implemented yet</source>
+        <translation>BLE not implemented yet</translation>
+    </message>
+    <message>
+        <source>Enabled Services:</source>
+        <translation>Enabled Services:</translation>
+    </message>
 </context>
 </TS>

@@ -73,6 +73,9 @@ MainController::MainController (QObject *parent)
     // check for updates
     if (readSetting(E_STARTUPUDATECHECK).toBool())
         checkForUpdates();
+
+    // start the tcp server (if enabled)
+    startTCPServer();
 }
 
 
@@ -101,6 +104,10 @@ QVariant MainController::readSetting (Settingskey key) {
         return qSettings->value("port", 1030);
     case E_STARTUPUDATECHECK:
         return qSettings->value("startupupdatecheck", true);
+    case E_TCP_ENABLED:
+        return qSettings->value("tcpenabled", true);
+    case E_BLE_ENABLED:
+        return qSettings->value("bleenabled", true);
     case E_DEBUGMODE:
         return qSettings->value("debugmode", false);
     }
@@ -129,6 +136,12 @@ void MainController::writeSetting (Settingskey key, QVariant content) {
     case E_STARTUPUDATECHECK:
         qSettings->setValue("startupupdatecheck", content);
         break;
+    case E_TCP_ENABLED:
+        qSettings->setValue("tcpenabled", content);
+        break;
+    case E_BLE_ENABLED:
+        qSettings->setValue("bleenabled", content);
+        break;
     case E_DEBUGMODE:
         qSettings->setValue("debugmode", content);
         break;
@@ -145,6 +158,30 @@ Client* MainController::getClientById (QString id) {
             return ce;
     }
     return nullptr;
+}
+
+
+
+void MainController::startTCPServer () {
+    if (tcpServer) {
+        // unpair all
+        int countClients = clients.size();
+        for (int i = 0; i < countClients; i++)
+            clients.at(i)->unpair();
+        // close previous connection
+        tcpServer->close();
+        disconnect(tcpServer, &QTcpServer::newConnection,
+                   this, &MainController::acceptConnection);
+        delete(tcpServer);
+    }
+
+    // create new tcp server
+    if (readSetting(E_TCP_ENABLED).toBool()) {
+        tcpServer = new QTcpServer(this);
+        connect(tcpServer, &QTcpServer::newConnection,
+                this, &MainController::acceptConnection);
+        tcpServer->listen(QHostAddress::Any, readSetting(E_PORT).toInt());
+    }
 }
 
 
@@ -168,6 +205,43 @@ void MainController::parseOpenRequest () {
         w->show();
         w->trayIcon->hide();
     }
+}
+
+
+
+void MainController::acceptConnection () {
+    QTcpSocket *socket = tcpServer->nextPendingConnection();
+    if (!socket)
+        return;
+
+    // wait for 10 seconds or until the initialization finished
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [&]{
+        // when the timer time outs: close socket and delete
+        socket->close();
+        socket->disconnect();
+        socket->deleteLater();
+        timer->stop();
+        timer->disconnect();
+        timer->deleteLater();
+    });
+    connect(socket, &QTcpSocket::readyRead, this, [&]{
+        // forward the server to the client
+        QString message = socket->readLine();
+        QString clientId = message.split('\0').at(0).split("c=\"")
+                .at(1).split('"').at(0);
+        Client *client = getClientById(clientId);
+        if (client)
+            client->pair(socket, message);
+        else
+            socket->close();
+
+        socket->disconnect();
+        timer->stop();
+        timer->deleteLater();
+    });
+    timer->setSingleShot(true);
+    timer->start(10000);
 }
 
 
@@ -247,11 +321,21 @@ void MainController::saveSettings () {
     }
     writeSetting(E_AUTOSTART, autostart);
 
-    // port
-    writeSetting(E_PORT, s->port->value());
-
     // automatic update check
     writeSetting(E_STARTUPUDATECHECK, s->startupUpdateCheck->isChecked());
+
+    // port and TCP enabled
+    bool newTcpEnabled = s->tcpEnabled->isChecked();
+    int newPort = s->port->value();
+    if (newPort != readSetting(E_PORT).toInt()
+            || newTcpEnabled != readSetting(E_TCP_ENABLED).toBool()) {
+        writeSetting(E_PORT, newPort);
+        writeSetting(E_TCP_ENABLED, newTcpEnabled);
+        startTCPServer();
+    }
+
+    // BLE enabled
+    writeSetting(E_BLE_ENABLED, s->bleEnabled->isChecked());
 
     // debug mode
     writeSetting(E_DEBUGMODE, s->debugMode->isChecked());
@@ -295,6 +379,12 @@ void MainController::resetSettings () {
 
     // automatic update check
     s->startupUpdateCheck->setChecked(readSetting(E_STARTUPUDATECHECK).toBool());
+
+    // TCP enabled
+    s->tcpEnabled->setChecked(readSetting(E_TCP_ENABLED).toBool());
+
+    // BLE enabled
+    s->bleEnabled->setChecked(readSetting(E_BLE_ENABLED).toBool());
 
     // debug mode
     s->debugMode->setChecked(readSetting(E_DEBUGMODE).toBool());
