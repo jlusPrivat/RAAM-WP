@@ -187,6 +187,14 @@
         <source>Clients</source>
         <translation>Clients</translation>
     </message>
+    <message>
+        <source>Allow connection?</source>
+        <translation>Allow connection?</translation>
+    </message>
+    <message>
+        <source>Client &quot;%1&quot; wants to connect to this computer. Allow connection?</source>
+        <translation>Client &quot;%1&quot; wants to connect to this computer. Allow connection?</translation>
+    </message>
 </context>
 <context>
     <name>PairingWindow</name>

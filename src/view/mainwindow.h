@@ -28,6 +28,7 @@ public:
     ~MainWindow();
     void showMessage(QString, bool);
     bool askForRestart();
+    bool askForConnect(QString);
 
 
 private:

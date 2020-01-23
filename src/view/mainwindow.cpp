@@ -77,6 +77,27 @@ bool MainWindow::askForRestart () {
 
 
 
+bool MainWindow::askForConnect (QString clientname) {
+    // configure the message
+    QMessageBox modal(QMessageBox::Question, tr("Allow connection?"),
+                      tr("Client \"%1\" wants to connect to this computer."
+                         " Allow connection?").arg(clientname),
+                      QMessageBox::NoButton, this);
+    QPushButton *buttonYes = modal.addButton(tr("Yes"), QMessageBox::YesRole);
+    modal.addButton(tr("No"), QMessageBox::NoRole);
+    modal.setDefaultButton(buttonYes);
+
+    // display the message
+    modal.exec();
+
+    // check the result
+    if (modal.clickedButton() == buttonYes)
+        return true;
+    return false;
+}
+
+
+
 void MainWindow::closeEvent (QCloseEvent *event) {
     sigCloseRequested(false);
     event->ignore();

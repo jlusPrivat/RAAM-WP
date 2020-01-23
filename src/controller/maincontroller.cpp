@@ -16,6 +16,7 @@ MainController::MainController (QObject *parent)
 
     // create the window
     w = new MainWindow();
+    qApp->setQuitOnLastWindowClosed(false);
     resetSettings();
 
     // connect the signals with the main window
@@ -246,8 +247,9 @@ void MainController::acceptConnection () {
             hmac = socket->read(32);
 
         Client *client = getClientById(clientId);
-        if (client && client->isActive()) {
-            // !!! ask before pairing
+        // ask before pairing
+        if (client && client->isActive() &&
+                (!client->askBeforeConnect || w->askForConnect(clientId))) {
             client->pair(socket, message, hmac);
         }
         else
