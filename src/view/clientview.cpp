@@ -40,9 +40,7 @@ ClientView::ClientView (QWidget *parent)
                                     tr("Delete"), wList);
     listBtnRemove->setDisabled(true);
     connect(listBtnRemove, &QPushButton::clicked, this, [&]{
-        QListWidgetItem *item = listView->currentItem();
-        if (item)
-            sigRemoveClient(item->text());
+        sigRemoveClient(currentItem());
     });
     lList->addWidget(listBtnRemove, 1, 1);
 
@@ -117,6 +115,11 @@ ClientView::ClientView (QWidget *parent)
     confOnlyPluggedIn->setText(tr("Only plugged in Audio Endpoints will be visible"));
     lConfDiag->addRow(tr("Only Plugged:"), confOnlyPluggedIn);
 
+    // add debug mode
+    confDebugMode = new QCheckBox(wConfDiag);
+    confDebugMode->setText(tr("Do not check HMACs of client transmissions"));
+    lConfDiag->addRow(tr("Debug mode:"), confDebugMode);
+
 
     // add the right sided buttons
     QWidget *wConfBtns = new QWidget(wConfDiag);
@@ -139,37 +142,31 @@ ClientView::ClientView (QWidget *parent)
             this, [&]{confBtnSave->setDisabled(false);});
     connect(confOnlyPluggedIn, &QCheckBox::stateChanged,
             this, [&]{confBtnSave->setDisabled(false);});
+    connect(confDebugMode, &QCheckBox::stateChanged,
+            this, [&]{confBtnSave->setDisabled(false);});
     connect(confBtnSave, &QPushButton::clicked, this, [&]{
-        QListWidgetItem *item = listView->currentItem();
-        if (item)
-            sigSaveClient(item->text());
+        sigSaveClient(currentItem());
     });
     lConfBtns->addWidget(confBtnSave);
 
     // the reset button
     confBtnReset = new QPushButton(tr("Reset"), wConfBtns);
     connect(confBtnReset, &QPushButton::clicked, this, [&]{
-        QListWidgetItem *item = listView->currentItem();
-        if (item)
-            sigSelectClient(item->text());
+        sigSelectClient(currentItem());
     });
     lConfBtns->addWidget(confBtnReset);
 
     // the pair button
     confBtnPair = new QPushButton(tr("Pair"), wConfBtns);
     connect(confBtnPair, &QPushButton::clicked, this, [&]{
-        QListWidgetItem *item = listView->currentItem();
-        if (item)
-            sigOpenPairWindow(item->text());
+        sigOpenPairWindow(currentItem());
     });
     lConfBtns->addWidget(confBtnPair);
 
     // the disconnect button
     confBtnDisconnect = new QPushButton(tr("Disconnect"), wConfBtns);
-    connect(confBtnReset, &QPushButton::clicked, this, [&]{
-        QListWidgetItem *item = listView->currentItem();
-        if (item)
-            sigDisconnectClient(item->text());
+    connect(confBtnDisconnect, &QPushButton::clicked, this, [&]{
+        sigDisconnectClient(currentItem());
     });
     lConfBtns->addWidget(confBtnDisconnect);
 
@@ -207,6 +204,15 @@ void ClientView::updateItem (QString oldId, QString newId,
         item->setToolTip(getToolTip(state));
         listView->sortItems();
     }
+}
+
+
+
+QString ClientView::currentItem () {
+    QListWidgetItem *item = listView->currentItem();
+    if (!item)
+        return "";
+    return item->text();
 }
 
 
@@ -268,7 +274,7 @@ QValidator::State ClientView::ClientIdValidator::validate
 (QString &str, int &pos) const {
     State precheck = QRegExpValidator::validate(str, pos);
     if (precheck != Acceptable || !cw->getItemById(str)
-            || str == cw->listView->currentItem()->text())
+            || str == cw->currentItem())
         return precheck;
     return Invalid;
 }

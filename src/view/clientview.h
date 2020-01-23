@@ -38,6 +38,7 @@ public:
     QCheckBox *confAskPairing = nullptr;
     QCheckBox *confShowNotification = nullptr;
     QCheckBox *confOnlyPluggedIn = nullptr;
+    QCheckBox *confDebugMode = nullptr;
     QPushButton *confBtnSave = nullptr;
     QPushButton *confBtnReset = nullptr;
     QPushButton *confBtnPair = nullptr;
@@ -48,6 +49,7 @@ public:
     void lstAddItem(QString, Client::ConnectionState);
     void lstRemoveItem(QString);
     void updateItem(QString, QString, Client::ConnectionState);
+    QString currentItem();
 
 
 signals:

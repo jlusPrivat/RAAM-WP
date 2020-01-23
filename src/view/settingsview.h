@@ -46,7 +46,6 @@ public:
     QCheckBox *startupUpdateCheck = nullptr;
     QCheckBox *tcpEnabled = nullptr;
     QCheckBox *bleEnabled = nullptr;
-    QCheckBox *debugMode = nullptr;
     QPushButton *buttonSave = nullptr;
 
 

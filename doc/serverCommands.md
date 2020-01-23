@@ -29,24 +29,27 @@ The QR Code contains these information in this exact order.
 ## Establishing a connection
 ### About TCP/BLE messages
 * Following specifications describe both ways of communication.
-* TCP / BLE messages consist of Null terminated 2 byte Wide Character Strings. (Null termination before HMAC)
-* Every TCP/BLE message is key-value based in form of: `key1="value1";key2="value2"` for every type of value. Exceptions are error messages.
+* TCP / BLE messages consist of Null terminated UTF-8 Character Strings. (Null termination before HMAC)
+* Every TCP/BLE message is key-value based in form of: `key1="value1";key2="value2";` for every type of value. Exceptions are error messages.
 * Values containing a `"` character are prohibited and lead to the message being rejected.
 * Every Message has to have the 32 bytes of the HMAC (using sha256) appended in raw binary form. The HMAC is generated from the entire message, excluding only the HMAC itself. If the HMAC is wrong, "WRONG_HMAC" will be returned. This is optional, when debug mode is enabled.
 * Rejected messages will be fully ignored, unless a specific error message is returned.
-* Furhter rules regarding the messages must be extracted from the following section.
+* Further rules regarding the messages must be extracted from the following section.
 
 
 ## About Keys and Actions
 ### Overview of all actions
-* **init**: Must be issued by the client within 10 seconds after establishing a transport layer connection using the servers IP adress and port. *!!! No further description yet*
-* **unknown**: This action is sent, when any correspondent does 
-* **close**: *!!! No description yet*
-* **changeServerId**: *!!! No description yet*
-* **changeClientId**: *!!! No description yet*
+* **init**: Must be issued by the client within 10 seconds after establishing a transport layer connection using the servers IP adress and port.
+* **unknown**: This action is sent, when any correspondent does not recognize the sent action. Additional required keys: `ua`
+* **changeServerId**: Only issued by server. Is sent, when the serverId changed.
+* **changeClientId**: Only issued by server. Is sent, when a new clientId was assigned to the paired client. Additional required keys: `c`
 * **info**: *!!! No description yet*
 * **devices**: *!!! No description yet*
 * **sessions**: *!!! No description yet*
+* **deviceVol**: *!!! No description yet*
+* **deviceMute**: *!!! No description yet*
+* **sessVol**: *!!! No description yet*
+* **sessMute**: *!!! No description yet*
 
 ### Overview of all possible keys
 Key | Description
@@ -57,3 +60,4 @@ Key | Description
 `s` | "s" for "server id". Must always be sent by server. If the server is unknown to the client, "SERVER_UNKNOWN" will be returned and the connection closed.
 `sw` | "sw" for "software". Is the name of the software sending this string. For example: "RAAM-WP"
 `v` | "v" for "version". Is the RAAM software version as semver string of the sender.
+`ua` | "ua" for "unrecognized action". The action name that was not recognized.

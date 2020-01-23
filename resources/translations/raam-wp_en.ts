@@ -100,6 +100,14 @@
         <source>Inactive</source>
         <translation>Inactive</translation>
     </message>
+    <message>
+        <source>Do not check HMACs of client transmissions</source>
+        <translation>Do not check HMACs of client transmissions</translation>
+    </message>
+    <message>
+        <source>Debug mode:</source>
+        <translation>Debug mode:</translation>
+    </message>
 </context>
 <context>
     <name>MainController</name>
@@ -123,6 +131,14 @@
     <message>
         <source>Not connected</source>
         <translation>Not connected</translation>
+    </message>
+    <message>
+        <source>&quot;%1&quot; paired</source>
+        <translation>&quot;%1&quot; paired</translation>
+    </message>
+    <message>
+        <source>&quot;%1&quot; unpaired</source>
+        <translation>&quot;%1&quot; unpaired</translation>
     </message>
 </context>
 <context>
@@ -288,14 +304,6 @@
         <translation>- 3 to 100 characters allowed
 - Only alphanumeric, space and underscore
 - Beginning only letters</translation>
-    </message>
-    <message>
-        <source>Do not check HMACs of client transmissions</source>
-        <translation>Do not check HMACs of client transmissions</translation>
-    </message>
-    <message>
-        <source>Debug mode:</source>
-        <translation>Debug mode:</translation>
     </message>
     <message>
         <source>TCP Server (recommended)</source>

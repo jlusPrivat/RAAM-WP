@@ -42,7 +42,7 @@ class MainController: public QObject {
 private:
     enum Settingskey {
         E_LANGUAGE, E_SERVERID, E_KEEPINTRAY, E_AUTOSTART, E_PORT,
-        E_STARTUPUDATECHECK, E_TCP_ENABLED, E_BLE_ENABLED, E_DEBUGMODE
+        E_STARTUPUDATECHECK, E_TCP_ENABLED, E_BLE_ENABLED
     };
 
 
@@ -92,9 +92,11 @@ private slots:
     /// open application from tray and hide tray icon
     void parseOpenRequest();
 
-    // tcp server
+    // server
     /// binds a new tcp connection to a client
     void acceptConnection();
+    /// updates the views for a changed client
+    void clientPairedChanged(Client*);
 
     // settings view
     /// connect to the server asking for the current

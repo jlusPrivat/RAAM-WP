@@ -61,6 +61,12 @@ MainController::MainController (QObject *parent)
         newClient->loadConfig();
         clients.append(newClient);
         w->clientTab->lstAddItem(clientName, newClient->getConnectionState());
+        connect(newClient, &Client::sigCommanded, this, [=](QString c){
+            // !!! Do better stuff with commands
+            w->showMessage(c, true);
+        });
+        connect(newClient, &Client::sigPairedChanged,
+                this, &MainController::clientPairedChanged);
     }
 
     // show the tray icon
@@ -108,8 +114,6 @@ QVariant MainController::readSetting (Settingskey key) {
         return qSettings->value("tcpenabled", true);
     case E_BLE_ENABLED:
         return qSettings->value("bleenabled", true);
-    case E_DEBUGMODE:
-        return qSettings->value("debugmode", false);
     }
     return 0;
 }
@@ -141,9 +145,6 @@ void MainController::writeSetting (Settingskey key, QVariant content) {
         break;
     case E_BLE_ENABLED:
         qSettings->setValue("bleenabled", content);
-        break;
-    case E_DEBUGMODE:
-        qSettings->setValue("debugmode", content);
         break;
     }
 }
@@ -216,32 +217,64 @@ void MainController::acceptConnection () {
 
     // wait for 10 seconds or until the initialization finished
     QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [&]{
-        // when the timer time outs: close socket and delete
+    connect(timer, &QTimer::timeout, this, [=]{
+        // when the timer times out: close socket and delete
+        socket->disconnectFromHost();
         socket->close();
-        socket->disconnect();
-        socket->deleteLater();
+        delete(socket);
         timer->stop();
-        timer->disconnect();
         timer->deleteLater();
     });
-    connect(socket, &QTcpSocket::readyRead, this, [&]{
+    connect(socket, &QTcpSocket::readyRead, this, [=]{
+        timer->stop();
+        delete(timer);
+        socket->disconnect();
+
         // forward the server to the client
         QString message = socket->readLine();
-        QString clientId = message.split('\0').at(0).split("c=\"")
-                .at(1).split('"').at(0);
+        QHash<QString, QString> *map = Client::parseMessage(message);
+        QString clientId;
+        if (!map || (clientId = map->value("c", "")).isEmpty()
+                || map->value("a", "") != "init") {
+            socket->close();
+            return;
+        }
+
+        // get the hmac
+        QByteArray hmac;
+        if (socket->bytesAvailable() >= 32)
+            hmac = socket->read(32);
+
         Client *client = getClientById(clientId);
-        if (client)
-            client->pair(socket, message);
+        if (client && client->isActive()) {
+            // !!! ask before pairing
+            client->pair(socket, message, hmac);
+        }
         else
             socket->close();
-
-        socket->disconnect();
-        timer->stop();
-        timer->deleteLater();
     });
     timer->setSingleShot(true);
     timer->start(10000);
+}
+
+
+
+void MainController::clientPairedChanged (Client* client) {
+    if (!client)
+        return;
+    QString id = client->getId();
+    bool paired = client->isPaired();
+
+    w->showMessage((paired ? tr("\"%1\" paired").arg(id)
+                           : tr("\"%1\" unpaired").arg(id)),
+                   client->showNotificationOnConnect);
+
+    // update buttons and icons
+    if (w->clientTab->currentItem() == id) {
+        w->clientTab->confBtnPair->setDisabled(paired);
+        w->clientTab->confBtnDisconnect->setDisabled(!paired);
+    }
+    w->clientTab->updateItem(id, id, client->getConnectionState());
 }
 
 
@@ -337,9 +370,6 @@ void MainController::saveSettings () {
     // BLE enabled
     writeSetting(E_BLE_ENABLED, s->bleEnabled->isChecked());
 
-    // debug mode
-    writeSetting(E_DEBUGMODE, s->debugMode->isChecked());
-
     // language
     QString newLanguage = s->language->currentData().toString();
     if (newLanguage != readSetting(E_LANGUAGE)) {
@@ -386,9 +416,6 @@ void MainController::resetSettings () {
     // BLE enabled
     s->bleEnabled->setChecked(readSetting(E_BLE_ENABLED).toBool());
 
-    // debug mode
-    s->debugMode->setChecked(readSetting(E_DEBUGMODE).toBool());
-
     // language
     auto langs = Language::languages;
     const int numEntries = langs.count();
@@ -429,6 +456,7 @@ void MainController::removeClient (QString id) {
         return;
 
     clients.removeAll(client);
+    client->disconnect();
     client->removeFromConfig();
     delete client;
     w->clientTab->lstRemoveItem(id);
@@ -450,6 +478,7 @@ void MainController::selectClient (QString id) {
     cw->confDescription->setPlainText(client->description);
     cw->confAskPairing->setChecked(client->askBeforeConnect);
     cw->confShowNotification->setChecked(client->showNotificationOnConnect);
+    cw->confDebugMode->setChecked(client->debugmode);
     cw->confOnlyPluggedIn->setChecked(client->isOnlyPluggedInDevices());
 
     // set fields enabled
@@ -498,6 +527,7 @@ void MainController::saveClient (QString id) {
     client->askBeforeConnect = cw->confAskPairing->isChecked();
     client->showNotificationOnConnect = cw->confShowNotification->isChecked();
     client->setOnlyPluggedInDevices(cw->confOnlyPluggedIn->isChecked());
+    client->debugmode = cw->confDebugMode->isChecked();
     client->saveConfig();
 
     // update the listview, if needed
@@ -552,13 +582,7 @@ void MainController::disconnectClient (QString id) {
         unselectClient();
         return;
     }
-    ClientView *cw = w->clientTab;
 
     // unpair
     client->unpair();
-    // update buttons
-    cw->confBtnPair->setDisabled(false);
-    cw->confBtnDisconnect->setDisabled(true);
-    // update icon
-    cw->updateItem(id, id, client->getConnectionState());
 }

@@ -6,6 +6,10 @@
 #include <QSettings>
 #include <QRandomGenerator>
 #include <QTcpSocket>
+#include <QMessageAuthenticationCode>
+#include <QRegularExpression>
+#include <QDateTime>
+#include <QtMath>
 
 
 
@@ -21,10 +25,11 @@
  * KEY                          DEF.    POSSIBLE
  * active                       false   true, false
  * description                  ""      All Strings
- * askBeforeConnect             false   true, false
- * showNotificationOnConnect    true    true, false
- * onlyPluggedInDevices         true    true, false
- * secretKey                    ""      64-byte Byte array
+ * askbeforeconnect             false   true, false
+ * shownotificationonconnect    true    true, false
+ * onlypluggedindevices         true    true, false
+ * secretkey                    ""      64-byte Byte array
+ * debugmode                    false   true, false
  * */
 class Client: public QObject {
     Q_OBJECT
@@ -42,8 +47,11 @@ public:
     QString description;
     bool askBeforeConnect = false;
     bool showNotificationOnConnect = true;
+    bool debugmode = false;
 
     // methods
+    /// parses a message into its contents; Null, when not parsable
+    static QHash<QString, QString> *parseMessage(QString);
     Client(QString, QSettings*, QObject* = nullptr);
     ~Client();
     /// Pushes the client config for permanent storage.
@@ -66,17 +74,20 @@ public:
 
 
 signals:
-    void sigPaired();
-    void sigUnpaired();
+    void sigPairedChanged(Client*);
     /// triggers, when any command is validated and triggered by the client
-    void sigCommanded(); // Add command here
+    void sigCommanded(QString); // !!! Add command here
     void sigErrored(Connectionerror);
 
 
 public slots:
-    void pair(QTcpSocket*, QString);
+    void pair(QTcpSocket*, QString, QByteArray);
     /// will properly close the connection
     void unpair();
+    /// will process any incoming message
+    void processIncomingTCPMessage();
+    /// processes any message and validates the byte array
+    void processIncomingMessage(QString, QByteArray);
 
 
 private:
@@ -85,7 +96,7 @@ private:
     QString clientId;
     QString origClientId = "";
     bool active = true;
-    QTcpSocket *currentParing = nullptr;
+    QTcpSocket *currentPairing = nullptr;
     bool onlyPluggedInDevices = true;
     QByteArray secretKey;
 

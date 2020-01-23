@@ -114,11 +114,6 @@ SettingsView::SettingsView (QWidget *parent)
     bleEnabled->setToolTip(tr("BLE not implemented yet"));
     lServiceEnabled->addWidget(bleEnabled);
 
-    // debug mode
-    debugMode = new QCheckBox(wForm);
-    debugMode->setText(tr("Do not check HMACs of client transmissions"));
-    lForm->addRow(tr("Debug mode:"), debugMode);
-
 
     // buttons at the end
     QWidget *wButtons = new QWidget(this);
@@ -149,8 +144,6 @@ SettingsView::SettingsView (QWidget *parent)
     connect(tcpEnabled, &QCheckBox::stateChanged,
             this, [&]{buttonSave->setDisabled(false);});
     connect(bleEnabled, &QCheckBox::stateChanged,
-            this, [&]{buttonSave->setDisabled(false);});
-    connect(debugMode, &QCheckBox::stateChanged,
             this, [&]{buttonSave->setDisabled(false);});
     buttonSave->setDefault(true);
     lButtons->addWidget(buttonSave);
