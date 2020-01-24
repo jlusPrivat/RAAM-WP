@@ -117,7 +117,10 @@ void Client::setId (QString id) {
         origClientId = clientId;
     clientId = id;
 
-    // !!! update the client via network
+    // update the client via network
+    Command c("changeClientId", Command::E_OUTBOUND);
+    c.put("c", id);
+    sendCommand(c);
 }
 
 
@@ -210,26 +213,33 @@ void Client::processIncomingMessage (QString message, QByteArray hmac) {
     // check the timestamp and hmac
     if (!debugmode) {
         QDateTime time(QDateTime::currentDateTime());
+        uint sentTime = map->value("t", 0).toInt();
         uint unixTime = time.toTime_t();
-        if (qFabs(map->value("t", 0).toInt() - unixTime) > 30) {
-            unpair();
+        if (qFabs(sentTime - unixTime) > 30
+                || sentTime < lastTimestamp) {
+            sendCommand("INVALID_TIMESTAMP");
             return;
         }
+        lastTimestamp = sentTime;
 
         QMessageAuthenticationCode correctHmac(QCryptographicHash::Sha256);
         correctHmac.setKey(secretKey);
         correctHmac.addData(message.toUtf8());
         QByteArray receivedHmac = hmac;
-        if (correctHmac.result() != receivedHmac)
-            // !!! Proper wrong hmac handling
+        if (correctHmac.result() != receivedHmac) {
+            sendCommand("WRONG_HMAC");
             return;
+        }
     }
 
     // parse the actions
-    QString action = map->value("a", "undefined");
+    Command command;
+    command.direction = Command::E_INBOUND;
+    command.putAll(*map);
+    if (!command.isValid())
+        return;
 
-    // initialize the connection
-    if (action == "init") {
+    if (command.getAction() == "init") {
         // disconnect only signals
         currentPairing->disconnect();
         connect(currentPairing, &QTcpSocket::readyRead,
@@ -239,7 +249,28 @@ void Client::processIncomingMessage (QString message, QByteArray hmac) {
         sigPairedChanged(this);
     }
 
-    // test action
-    else if (action == "test")
-        sigCommanded("test");
+    sigCommanded(this, command);
+}
+
+
+
+void Client::sendCommand (Command &command) {
+    if (!currentPairing || !command.isValid())
+        return;
+
+    QByteArray cByteArray = command.serialize(true).toUtf8();
+
+    QMessageAuthenticationCode hmac(QCryptographicHash::Sha256);
+    hmac.setKey(secretKey);
+    hmac.addData(cByteArray);
+
+    cByteArray.append(hmac.result());
+    currentPairing->write(cByteArray);
+}
+
+
+
+void Client::sendCommand (QString command) {
+    if (currentPairing)
+        currentPairing->write(command.toUtf8());
 }

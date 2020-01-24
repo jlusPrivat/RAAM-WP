@@ -10,6 +10,7 @@
 #include <QRegularExpression>
 #include <QDateTime>
 #include <QtMath>
+#include "model/command.h"
 
 
 
@@ -64,6 +65,7 @@ public:
     void generateSecretKey();
     QByteArray getSecretKey();
     QString getId();
+    /// also informs any connected clients
     void setId(QString);
     ConnectionState getConnectionState();
     bool isActive();
@@ -76,7 +78,7 @@ public:
 signals:
     void sigPairedChanged(Client*);
     /// triggers, when any command is validated and triggered by the client
-    void sigCommanded(QString); // !!! Add command here
+    void sigCommanded(Client*, Command&);
     void sigErrored(Connectionerror);
 
 
@@ -88,6 +90,12 @@ public slots:
     void processIncomingTCPMessage();
     /// processes any message and validates the byte array
     void processIncomingMessage(QString, QByteArray);
+    /// formalize command and append hmac and timestamp.
+    /// Safe to call without connection
+    void sendCommand(Command&);
+    /// semd raw command without hmac or timestamp.
+    /// Safe to call without connection
+    void sendCommand(QString);
 
 
 private:
@@ -99,6 +107,7 @@ private:
     QTcpSocket *currentPairing = nullptr;
     bool onlyPluggedInDevices = true;
     QByteArray secretKey;
+    uint lastTimestamp = 0;
 
 
 };

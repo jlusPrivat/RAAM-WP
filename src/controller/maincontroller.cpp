@@ -62,10 +62,8 @@ MainController::MainController (QObject *parent)
         newClient->loadConfig();
         clients.append(newClient);
         w->clientTab->lstAddItem(clientName, newClient->getConnectionState());
-        connect(newClient, &Client::sigCommanded, this, [=](QString c){
-            // !!! Do better stuff with commands
-            w->showMessage(c, true);
-        });
+        connect(newClient, &Client::sigCommanded,
+                this, &MainController::clientCommanded);
         connect(newClient, &Client::sigPairedChanged,
                 this, &MainController::clientPairedChanged);
     }
@@ -188,6 +186,14 @@ void MainController::startTCPServer () {
 
 
 
+void MainController::broadcastCommand (Command &command) {
+    int count = clients.count();
+    for (int i = 0; i < count; i++)
+        clients.at(i)->sendCommand(command);
+}
+
+
+
 void MainController::parseCloseRequest (bool force) {
     if (force || !readSetting(E_KEEPINTRAY).toBool()) {
         // fully close application
@@ -247,13 +253,20 @@ void MainController::acceptConnection () {
             hmac = socket->read(32);
 
         Client *client = getClientById(clientId);
-        // ask before pairing
-        if (client && client->isActive() &&
-                (!client->askBeforeConnect || w->askForConnect(clientId))) {
-            client->pair(socket, message, hmac);
-        }
-        else
+        // no client found
+        if (!client) {
+            socket->write("CLIENT_UNKNOWN");
             socket->close();
+        }
+        // client not active or user rejected
+        else if (!client->isActive() ||
+                 (client->askBeforeConnect && !w->askForConnect(clientId))) {
+            socket->write("CLIENT_DISABLED");
+            socket->close();
+        }
+        // pairing is allowed
+        else
+            client->pair(socket, message, hmac);
     });
     timer->setSingleShot(true);
     timer->start(10000);
@@ -277,6 +290,28 @@ void MainController::clientPairedChanged (Client* client) {
         w->clientTab->confBtnDisconnect->setDisabled(!paired);
     }
     w->clientTab->updateItem(id, id, client->getConnectionState());
+}
+
+
+
+void MainController::clientCommanded (Client *client, Command &command) {
+    // send initialization answer
+    if (command.getAction() == "init") {
+        Command c("init", Command::E_OUTBOUND);
+        c.put("s", readSetting(E_SERVERID).toString());
+        client->sendCommand(c);
+    }
+
+    // returns the info for the user
+    else if (command.getAction() == "info") {
+        Command c("inforeturn", Command::E_OUTBOUND);
+        c.put("s", readSetting(E_SERVERID).toString());
+        c.put("c", client->getId());
+        c.put("sw", SOFTWARE_NAME);
+        c.put("v", VERSION);
+        c.put("sv", SPECS_VERSION);
+        client->sendCommand(c);
+    }
 }
 
 
@@ -327,9 +362,14 @@ void MainController::checkForUpdates () {
 void MainController::saveSettings () {
     SettingsView *s = w->settingsTab;
 
-    // server id
-    if (s->serverId->hasAcceptableInput())
+    // inform clients about new server id
+    if (s->serverId->hasAcceptableInput()
+            && readSetting(E_SERVERID).toString() != s->serverId->text()) {
         writeSetting(E_SERVERID, s->serverId->text());
+        Command c("changeServerId", Command::E_OUTBOUND);
+        c.put("s", s->serverId->text());
+        broadcastCommand(c);
+    }
     else
         s->serverId->setText(readSetting(E_SERVERID).toString());
 

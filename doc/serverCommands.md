@@ -1,3 +1,5 @@
+# Specs Version 1.0.0
+
 # Server Commands
 This guide describes the usage of the RAAM-WP tcp socket server.
 It therefore helps implementing applications, that employs the network
@@ -39,25 +41,27 @@ The QR Code contains these information in this exact order.
 
 ## About Keys and Actions
 ### Overview of all actions
-* **init**: Must be issued by the client within 10 seconds after establishing a transport layer connection using the servers IP adress and port.
-* **unknown**: This action is sent, when any correspondent does not recognize the sent action. Additional required keys: `ua`
-* **changeServerId**: Only issued by server. Is sent, when the serverId changed.
+* **init**: Must be issued by the client within 10 seconds after establishing a transport layer connection using the servers IP adress and port and the additional required key `c`. The server has to answer using this action with the additional required key `s`.
+* **changeServerId**: Only issued by server. Is sent, when the serverId changed. Additional required keys: `s`
 * **changeClientId**: Only issued by server. Is sent, when a new clientId was assigned to the paired client. Additional required keys: `c`
-* **info**: *!!! No description yet*
-* **devices**: *!!! No description yet*
-* **sessions**: *!!! No description yet*
-* **deviceVol**: *!!! No description yet*
-* **deviceMute**: *!!! No description yet*
-* **sessVol**: *!!! No description yet*
-* **sessMute**: *!!! No description yet*
+* **info**: Can be issued by both server or client. The other party answers with "inforeturn" action.
+* **inforeturn**: Server sends with additional required keys `s`, `c`, `sw`, `v`, `sv`. Client sends with additional required keys `c`, `sw`, `v`, `sv`.
+* **enumDevices**: *!!! No description yet*
+* **enumSessions**: *!!! No description yet*
+* **dev**: *!!! No description yet*
+* **sess**: *!!! No description yet*
 
 ### Overview of all possible keys
 Key | Description
 --- | -----------
-`t` | "t" for "time". Must always be sent. The current unix timestamp in seconds. This is used to ensure "freshness" of the data being integrity checked with the hmac. If the received timestamp differs from the local timestamp by more than 30 seconds, "INVALID_TIMESTAMP" will be returned and the connection closed. Applications must keep track of the last sent timestamp and check, that no message with an earlier timestamp is allowed. Messages with earlier timestamps will be ignored.
+`t` | "t" for "time". Must always be sent, except for devices in debug mode. The current unix timestamp in seconds. This is used to ensure "freshness" of the data being integrity checked with the hmac. If the received timestamp differs from the local timestamp by more than 30 seconds, "INVALID_TIMESTAMP" will be returned and the connection closed. Applications must keep track of the last sent timestamp and check, that no message with an earlier timestamp is allowed. Messages with earlier timestamps will be ignored.
 `a` | "a" for "action". Must always be sent. Possible values see above.
-`c` | "c" for "client". Must always be sent by client. Must be Client ID as provided by the server upon pairing. If the client is unknown to the server, "CLIENT_UNKNOWN" will be returned and the connection closed. If the client is disabled, "CLIENT_DISABLED" will be returned and the connection closed.
-`s` | "s" for "server id". Must always be sent by server. If the server is unknown to the client, "SERVER_UNKNOWN" will be returned and the connection closed.
+`c` | "c" for "client". Must be Client ID as provided by the server upon pairing. If the client is unknown to the server, "CLIENT_UNKNOWN" will be returned and the connection closed. If the client is disabled or the user rejected a pairing request, "CLIENT_DISABLED" will be returned and the connection closed.
+`s` | "s" for "server id". If the server is unknown to the client, "SERVER_UNKNOWN" will be returned and the connection closed.
 `sw` | "sw" for "software". Is the name of the software sending this string. For example: "RAAM-WP"
+`sv` | "sv" for "specs version". The version of this document.
 `v` | "v" for "version". Is the RAAM software version as semver string of the sender.
-`ua` | "ua" for "unrecognized action". The action name that was not recognized.
+`dn` | "dn" for "device name".
+`dc` | "dc" for device configuration. Can be either `i` (for input like microphone) or `o` (for output like speaker). Has an `s` appended, if it is the default device for that role. Has an `u` appended, if it is unplugged.
+`m` | "m" for "mute". Can be either `t` for true or `f` for false.
+`l` | "l" for "level". Any value between 0 and 100.

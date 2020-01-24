@@ -71,7 +71,7 @@ private:
     QTcpServer *tcpServer = nullptr;
     QList<Client*> clients;
 
-    // methos
+    // methods
     /// Selects in model currently selected language (does not visualize)
     void updateLanguageController(QString);
     /// Reads the settings with the given key. If not set, read default.
@@ -82,6 +82,8 @@ private:
     Client* getClientById(QString);
     /// (re-)starts the TCP server on the given port, if allowed by settings
     void startTCPServer();
+    /// broadcasts a command to all paired clients
+    void broadcastCommand(Command&);
 
 
 private slots:
@@ -97,6 +99,8 @@ private slots:
     void acceptConnection();
     /// updates the views for a changed client
     void clientPairedChanged(Client*);
+    /// processes all commands received from a client
+    void clientCommanded(Client*, Command&);
 
     // settings view
     /// connect to the server asking for the current
