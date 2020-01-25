@@ -6,6 +6,8 @@
 #include "utils/SafeRelease.h"
 #include "utils/makros.h"
 #include "model/outputdevice.h"
+#include "model/client.h"
+#include "model/command.h"
 
 
 
@@ -15,14 +17,15 @@
  * Manages and creates all OutputDevices, AudioSessionGroups and AudioSessions.
  * Notifies about all changes in the audio system.
  */
-class AudioManager: public QObject, IMMNotificationClient {
+class AudioController: public QObject, IMMNotificationClient {
     Q_OBJECT
 
 
 public:
-    AudioManager(QObject* = nullptr);
-    ~AudioManager();
+    AudioController(QObject* = nullptr);
+    ~AudioController();
     HRESULT getInternalStatus();
+    void clientCommanded(Client*, Command&);
 
     // For IMMNotificationClient
     HRESULT __stdcall OnDefaultDeviceChanged(EDataFlow, ERole, LPCWSTR) override;
@@ -34,6 +37,10 @@ public:
     ULONG __stdcall AddRef() override;
     ULONG __stdcall Release() override;
     HRESULT __stdcall QueryInterface(REFIID, void**) override;
+
+
+signals:
+    void broadcastCommand(Command&);
 
 
 private:
@@ -48,8 +55,13 @@ private:
 
     // methods
     HRESULT init();
+    void connectDeviceSignals(OutputDevice*);
     bool findOutputDevice(LPCWSTR, OutputDevice**);
+    bool findOutputDevice(QString, OutputDevice**);
     bool findDefaultOutputDevice(OutputDevice**);
+    /// Fills the preset attributes for a controller to the desired values
+    void fillCommand(Command&, OutputDevice*);
+    static QString formFactorToStr(EndpointFormFactor);
 
 
 };

@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     controller/language.cpp \
     controller/maincontroller.cpp \
+    controller/audiocontroller.cpp \
     main.cpp \
     model/client.cpp \
     model/command.cpp \
@@ -25,20 +26,19 @@ SOURCES += \
     view/aboutview.cpp \
     view/clientview.cpp \
     view/mainwindow.cpp \
-    model/audiomanager.cpp \
     view/pairingwindow.cpp \
     view/settingsview.cpp
 
 HEADERS += \
     controller/language.h \
     controller/maincontroller.h \
+    controller/audiocontroller.h \
     model/client.h \
     model/command.h \
     model/outputdevice.h \
     view/aboutview.h \
     view/clientview.h \
     view/mainwindow.h \
-    model/audiomanager.h \
     utils/SafeRelease.h \
     utils/makros.h \
     view/pairingwindow.h \

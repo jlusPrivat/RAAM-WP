@@ -14,8 +14,42 @@ OutputDevice::OutputDevice (IMMDevice *pDevice, QObject *parent)
 OutputDevice::~OutputDevice () {
     SafeRelease(&pMMDevice);
     SafeRelease(&pPropertyStore);
+    SafeRelease(&pEndpointVolume);
+    if (pEndpointVolume)
+        pEndpointVolume->UnregisterControlChangeNotify(this);
     if (pEndpointId)
         CoTaskMemFree(pEndpointId);
+}
+
+
+
+void OutputDevice::setMute (bool m) {
+    pEndpointVolume->SetMute(m, nullptr);
+}
+
+
+
+bool OutputDevice::getMute () {
+    int rv = 1;
+    if (pEndpointVolume)
+        pEndpointVolume->GetMute(&rv);
+    return rv;
+}
+
+
+
+void OutputDevice::setVolume (float v) {
+    if (pEndpointVolume)
+        pEndpointVolume->SetMasterVolumeLevelScalar(v, nullptr);
+}
+
+
+
+float OutputDevice::getVolume () {
+    float rv = 0;
+    if (pEndpointVolume)
+        pEndpointVolume->GetMasterVolumeLevelScalar(&rv);
+    return rv;
 }
 
 
@@ -56,6 +90,12 @@ void OutputDevice::setState (DWORD newState) {
 
 
 
+DWORD OutputDevice::getState () {
+    return state;
+}
+
+
+
 void OutputDevice::updateProperty (const PROPERTYKEY propKey) {
     if (propKey.fmtid == PKEY_Device_FriendlyName.fmtid)
         updateDescriptionLong();
@@ -63,9 +103,51 @@ void OutputDevice::updateProperty (const PROPERTYKEY propKey) {
         updateDescriptionShort();
     /* Not working, see Github issue
     else if (propKey.fmtid == PKEY_AudioEndpoint_FormFactor.fmtid)
-        updateFormFactor();
-    else if (propKey.fmtid == PKEY_AudioEndpoint_ControlPanelPageProvider.fmtid)
-        updateControlPanelPageProvider();*/
+        updateFormFactor();*/
+}
+
+
+
+QString OutputDevice::getDescriptionLong () {
+    return descriptionLong;
+}
+
+
+
+QString OutputDevice::getDescriptionShort () {
+    return descriptionShort;
+}
+
+
+
+EndpointFormFactor OutputDevice::getFormFactor () {
+    return formFactor;
+}
+
+
+
+ULONG __stdcall OutputDevice::AddRef () {
+    return 1;
+}
+
+
+
+ULONG __stdcall OutputDevice::Release () {
+    return 0;
+}
+
+
+
+HRESULT __stdcall OutputDevice::QueryInterface (REFIID, void** ppvInterface) {
+    *ppvInterface = nullptr;
+    return E_NOINTERFACE;
+}
+
+
+
+HRESULT __stdcall OutputDevice::OnNotify(PAUDIO_VOLUME_NOTIFICATION_DATA) {
+    sigVolumeOrMuteChanged();
+    return S_OK;
 }
 
 
@@ -79,6 +161,14 @@ HRESULT OutputDevice::init () {
     hr = pMMDevice->GetState(&state);
     FAILCATCH;
 
+    // get the endpoint volume
+    if (state == DEVICE_STATE_ACTIVE) {
+        hr = pMMDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_ALL,
+                                 nullptr, reinterpret_cast<void**>(&pEndpointVolume));
+        FAILCATCH;
+        pEndpointVolume->RegisterControlChangeNotify(this);
+    }
+
     // get the property store
     hr = pMMDevice->OpenPropertyStore(STGM_READ, &pPropertyStore);
     FAILCATCH;
@@ -90,8 +180,6 @@ HRESULT OutputDevice::init () {
     hr = updateDescriptionShort();
     FAILCATCH;
     hr = updateFormFactor();
-    FAILCATCH;
-    hr = updateControlPanelPageProvider();
 
 done:
     disableSignalling = false;
@@ -164,32 +252,5 @@ done:
         sigInternalStatusError(hr);
     else if (!disableSignalling)
         sigFormFactorChanged(&formFactor);*/
-    return hr;
-}
-
-
-
-HRESULT OutputDevice::updateControlPanelPageProvider () {
-    /* Not working, see Github issue https://github.com/jlusPrivat/RAAM-WP/issues/1
-    PROPVARIANT propvariant;
-    PropVariantInit(&propvariant);
-    CLSID newCPPP = CLSID_NULL;
-
-    hr = pPropertyStore->GetValue(PKEY_AudioEndpoint_ControlPanelPageProvider,
-                                  &propvariant);
-    FAILCATCH;
-    if (propvariant.vt != VT_LPWSTR)
-        goto done;
-    hr = CLSIDFromString(propvariant.pwszVal, &newCPPP);
-    FAILCATCH;
-    if (controlPanelPageProvider != newCPPP)
-        controlPanelPageProvider = newCPPP;
-
-done:
-    PropVariantClear(&propvariant);
-    if (!disableSignalling && FAILED(hr))
-        sigInternalStatusError(hr);
-    else if (!disableSignalling)
-        sigControlPanelPageProviderChanged(&controlPanelPageProvider);*/
     return hr;
 }

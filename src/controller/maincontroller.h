@@ -8,7 +8,8 @@
 #include <QtNetwork>
 #include <QTcpServer>
 #include <QTimer>
-#include "controller/language.h"
+#include "audiocontroller.h"
+#include "language.h"
 #include "model/client.h"
 #include "view/mainwindow.h"
 #include "view/pairingwindow.h"
@@ -68,6 +69,7 @@ private:
     QTranslator *translator = new QTranslator(this);
     QSettings *qSettings = nullptr;
     QNetworkAccessManager *networkManager = new QNetworkAccessManager(this);
+    AudioController *audioController = nullptr;
     QTcpServer *tcpServer = nullptr;
     QList<Client*> clients;
 

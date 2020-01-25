@@ -32,7 +32,8 @@ The QR Code contains these information in this exact order.
 ### About TCP/BLE messages
 * Following specifications describe both ways of communication.
 * TCP / BLE messages consist of Null terminated UTF-8 Character Strings. (Null termination before HMAC)
-* Every TCP/BLE message is key-value based in form of: `key1="value1";key2="value2";` for every type of value. Exceptions are error messages.
+* Every TCP/BLE message is key-value based in form of: `key1="value1";key2="value2";` for every type of value. No key may be used more than once in a single message.
+* Only error messages do not come as key-value based messages.
 * Values containing a `"` character are prohibited and lead to the message being rejected.
 * Every Message has to have the 32 bytes of the HMAC (using sha256) appended in raw binary form. The HMAC is generated from the entire message, excluding only the HMAC itself. If the HMAC is wrong, "WRONG_HMAC" will be returned. This is optional, when debug mode is enabled.
 * Rejected messages will be fully ignored, unless a specific error message is returned.
@@ -42,13 +43,15 @@ The QR Code contains these information in this exact order.
 ## About Keys and Actions
 ### Overview of all actions
 * **init**: Must be issued by the client within 10 seconds after establishing a transport layer connection using the servers IP adress and port and the additional required key `c`. The server has to answer using this action with the additional required key `s`.
-* **changeServerId**: Only issued by server. Is sent, when the serverId changed. Additional required keys: `s`
-* **changeClientId**: Only issued by server. Is sent, when a new clientId was assigned to the paired client. Additional required keys: `c`
 * **info**: Can be issued by both server or client. The other party answers with "inforeturn" action.
 * **inforeturn**: Server sends with additional required keys `s`, `c`, `sw`, `v`, `sv`. Client sends with additional required keys `c`, `sw`, `v`, `sv`.
-* **enumDevices**: *!!! No description yet*
-* **enumSessions**: *!!! No description yet*
-* **dev**: *!!! No description yet*
+* **changeServerId**: Only issued by server. Is sent, when the serverId changed. Additional required keys: `s`.
+* **changeClientId**: Only issued by server. Is sent, when a new clientId was assigned to the paired client. Additional required keys: `c`.
+* **enumDevices**: Sent by the client as a request to receive all devices or detailed information about one particular device. The server responds with one "dev" action per device. Additional optional keys: `di`. When sent by the server, all devices may have changed and should be re enumerated by the client.
+* **enumSessions**: Sent by the client as a request to receive all audio sessions or detailed information about one particular session. The server responds with one "sess" action per audio session. Additional optional keys: `si`.
+* **dev**: Sent by the client, when changes are supposed to be made. Additional required keys: `di`. Additional optional keys: `m`, `l`.
+* **dev**: Sent by the server, when to a device changes were made, or when "enumDevices" was called, or when a new device was added, or when a device was removed. When a new device was added or when all devices are enumerated, all optional keys become required keys. Additional required keys: `di`, `dc`. Additional optional keys: `ddl`, `dds`, `dff`, `m`, `l`.
+* **sess**: Sent by the client, when changes are supposed to be made. Additional required keys: `si`. Additional optional keys: `m`, `l`.
 * **sess**: *!!! No description yet*
 
 ### Overview of all possible keys
@@ -58,10 +61,15 @@ Key | Description
 `a` | "a" for "action". Must always be sent. Possible values see above.
 `c` | "c" for "client". Must be Client ID as provided by the server upon pairing. If the client is unknown to the server, "CLIENT_UNKNOWN" will be returned and the connection closed. If the client is disabled or the user rejected a pairing request, "CLIENT_DISABLED" will be returned and the connection closed.
 `s` | "s" for "server id". If the server is unknown to the client, "SERVER_UNKNOWN" will be returned and the connection closed.
-`sw` | "sw" for "software". Is the name of the software sending this string. For example: "RAAM-WP"
+`sw` | "sw" for "software". Is the name of the software sending this string. For example: "RAAM-WP".
 `sv` | "sv" for "specs version". The version of this document.
 `v` | "v" for "version". Is the RAAM software version as semver string of the sender.
-`dn` | "dn" for "device name".
-`dc` | "dc" for device configuration. Can be either `i` (for input like microphone) or `o` (for output like speaker). Has an `s` appended, if it is the default device for that role. Has an `u` appended, if it is unplugged.
+`di` | "di" for "device id".
+`dc` | "dc" for "device configuration". Can be either "i" (for input like microphone) or "o" (for output like speaker). Has a "d" appended, if it is the default device for that role. Has an "u" appended, if it is unplugged, otherwise has an "a" appended, if is active. This value is just "0", when the device was removed or not found.
+`ddl` | "ddl" for "device description long".
+`dds` | "dds" for "device description short".
+`dff` | "dff" for "device form factor". Is one of these values: "RemoteNetworkDevice", "Speakers", "LineLevel", "Headphones", "Microphone", "Headset", "Handset", "UnknownDigitalPassthrough", "SPDIF", "DigitalAudioDisplayDevice", "UnknownFormFactor".
+`si` | "si" for "session id".
+`sdi` | "sdi" for "session display name".
 `m` | "m" for "mute". Can be either `t` for true or `f` for false.
-`l` | "l" for "level". Any value between 0 and 100.
+`l` | "l" for "soundlevel". Any value for the volume between 0 and 100.

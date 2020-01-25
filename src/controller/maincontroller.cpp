@@ -79,6 +79,11 @@ MainController::MainController (QObject *parent)
     if (readSetting(E_STARTUPUDATECHECK).toBool())
         checkForUpdates();
 
+    // start the model
+    audioController = new AudioController(this);
+    connect(audioController, &AudioController::broadcastCommand,
+            this, &MainController::broadcastCommand);
+
     // start the tcp server (if enabled)
     startTCPServer();
 }
@@ -180,7 +185,9 @@ void MainController::startTCPServer () {
         tcpServer = new QTcpServer(this);
         connect(tcpServer, &QTcpServer::newConnection,
                 this, &MainController::acceptConnection);
-        tcpServer->listen(QHostAddress::Any, readSetting(E_PORT).toInt());
+        if (!tcpServer->listen(QHostAddress::Any, readSetting(E_PORT).toInt())) {
+            // !!! error handling
+        }
     }
 }
 
@@ -312,6 +319,10 @@ void MainController::clientCommanded (Client *client, Command &command) {
         c.put("sv", SPECS_VERSION);
         client->sendCommand(c);
     }
+
+    // maybe the audio controller can work with it
+    else
+        audioController->clientCommanded(client, command);
 }
 
 

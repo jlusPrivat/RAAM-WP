@@ -117,7 +117,10 @@ ClientView::ClientView (QWidget *parent)
 
     // add debug mode
     confDebugMode = new QCheckBox(wConfDiag);
-    confDebugMode->setText(tr("Do not check HMACs of client transmissions"));
+    confDebugMode->setText(tr("For usage with raw TCP/BLE messages"));
+    confDebugMode->setToolTip(tr("No HMAC will be generated, instead\n"
+                                 "a newline character is appended.\n"
+                                 "No HMACS or timestamps will be validated."));
     lConfDiag->addRow(tr("Debug mode:"), confDebugMode);
 
 

@@ -101,12 +101,20 @@
         <translation>Inactive</translation>
     </message>
     <message>
-        <source>Do not check HMACs of client transmissions</source>
-        <translation>Do not check HMACs of client transmissions</translation>
-    </message>
-    <message>
         <source>Debug mode:</source>
         <translation>Debug mode:</translation>
+    </message>
+    <message>
+        <source>For usage with raw TCP/BLE messages</source>
+        <translation>For usage with raw TCP/BLE messages</translation>
+    </message>
+    <message>
+        <source>No HMAC will be generated, instead
+a newline character is appended.
+No HMACS or timestamps will be validated.</source>
+        <translation>No HMAC will be generated, instead
+a newline character is appended.
+No HMACS or timestamps will be validated.</translation>
     </message>
 </context>
 <context>

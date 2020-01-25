@@ -156,8 +156,11 @@ bool Client::isOnlyPluggedInDevices () {
 
 
 void Client::setOnlyPluggedInDevices (bool newState) {
-    onlyPluggedInDevices = newState;
-    // !!! update the list of devices
+    if (onlyPluggedInDevices != newState) {
+        onlyPluggedInDevices = newState;
+        Command c("enumDevices", Command::E_OUTBOUND);
+        sendCommand(c);
+    }
 }
 
 
@@ -258,13 +261,23 @@ void Client::sendCommand (Command &command) {
     if (!currentPairing || !command.isValid())
         return;
 
+    // filter the command, if device and not interesting for client
+    if (command.getAction() == "dev"
+            && ((onlyPluggedInDevices && !command.value("dc").contains("a"))
+                || (!onlyPluggedInDevices && !command.value("dc").contains("u")
+                    && !command.value("dc").contains("a"))))
+        return;
+
     QByteArray cByteArray = command.serialize(true).toUtf8();
+    if (!debugmode) {
+        QMessageAuthenticationCode hmac(QCryptographicHash::Sha256);
+        hmac.setKey(secretKey);
+        hmac.addData(cByteArray);
+        cByteArray.append(hmac.result());
+    }
+    else
+        cByteArray.append("\n");
 
-    QMessageAuthenticationCode hmac(QCryptographicHash::Sha256);
-    hmac.setKey(secretKey);
-    hmac.addData(cByteArray);
-
-    cByteArray.append(hmac.result());
     currentPairing->write(cByteArray);
 }
 

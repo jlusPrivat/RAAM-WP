@@ -17,6 +17,10 @@ bool Command::isValid () {
         if (getAction() == "inforeturn" && containsKey("c")
                 && containsKey("sw") && containsKey("v") && containsKey("sv"))
             return true;
+        if (getAction() == "enumDevices")
+            return true;
+        if (getAction() == "dev" && containsKey("di"))
+            return true;
     }
 
     // Outbound direction
@@ -30,6 +34,10 @@ bool Command::isValid () {
         if (getAction() == "inforeturn" && containsKey("s") && containsKey("c")
                 && containsKey("sw") && containsKey("v") && containsKey("sv"))
             return true;
+        if (getAction() == "enumDevices")
+            return true;
+        if (getAction() == "dev" && containsKey("di") && containsKey("dc"))
+            return true;
     }
 
     // Any direction
@@ -38,7 +46,6 @@ bool Command::isValid () {
 
     return false;
 }
-
 
 
 
@@ -100,4 +107,11 @@ void Command::put (QString key, int val) {
 
 void Command::putAll (QHash<QString, QString> &otherMap) {
     map = otherMap;
+}
+
+
+
+Command& Command::operator<< (QString key) {
+    map.insert(key, "");
+    return *this;
 }

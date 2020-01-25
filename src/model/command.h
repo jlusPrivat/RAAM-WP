@@ -40,6 +40,8 @@ public:
     void put(QString, int);
     /// puts many key value combinations into the command
     void putAll(QHash<QString, QString>&);
+    /// insert an empty key (maybe for later filling)
+    Command& operator<< (QString);
 
 
 private:
