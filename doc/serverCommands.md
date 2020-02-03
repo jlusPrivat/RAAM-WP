@@ -47,11 +47,13 @@ The QR Code contains these information in this exact order.
 * **inforeturn**: Server sends with additional required keys `s`, `c`, `sw`, `v`, `sv`. Client sends with additional required keys `c`, `sw`, `v`, `sv`.
 * **changeServerId**: Only issued by server. Is sent, when the serverId changed. Additional required keys: `s`.
 * **changeClientId**: Only issued by server. Is sent, when a new clientId was assigned to the paired client. Additional required keys: `c`.
-* **enumDevices**: Sent by the client as a request to receive all devices or detailed information about one particular device. The server responds with one "dev" action per device. Additional optional keys: `di`. When sent by the server, all devices may have changed and should be re enumerated by the client.
-* **enumSessions**: Sent by the client as a request to receive all audio sessions or detailed information about one particular session. The server responds with one "sess" action per audio session. Additional optional keys: `si`.
+* **enumDevices**: Sent by the client as a request to receive all devices or detailed information about one particular device. The server responds with one "dev" action per device. Additional optional keys: `di`.
+* **enumDevices**: Sent by the server, implicating all devices may have changed and should be re enumerated by the client.
+* **enumSessions**: Sent by the client as a request to receive all audio sessions or detailed information about one particular session. The server responds with one "sess" action per audio session. Additional optional keys: `si`. Additional required keys: `di`.
+* **enumSessions**:  When sent by the server, all sessions may have changed and should be re enumerated by the client. Additional required keys: `di`.
 * **dev**: Sent by the client, when changes are supposed to be made. Additional required keys: `di`. Additional optional keys: `m`, `l`.
-* **dev**: Sent by the server, when to a device changes were made, or when "enumDevices" was called, or when a new device was added, or when a device was removed. When a new device was added or when all devices are enumerated, all optional keys become required keys. Additional required keys: `di`, `dc`. Additional optional keys: `ddl`, `dds`, `dff`, `m`, `l`.
-* **sess**: Sent by the client, when changes are supposed to be made. Additional required keys: `si`. Additional optional keys: `m`, `l`.
+* **dev**: Sent by the server, when changes were made to a device, or when "enumDevices" was called, or when a new device was added, or when a device was removed. When a new device was added or when all devices are enumerated, all optional keys become required keys. Additional required keys: `di`, `dc`. Additional optional keys: `ddl`, `dds`, `dff`, `m`, `l`.
+* **sess**: Sent by the client, when changes are supposed to be made. Additional required keys: `si`, `di`. Additional optional keys: `m`, `l`.
 * **sess**: *!!! No description yet*
 
 ### Overview of all possible keys

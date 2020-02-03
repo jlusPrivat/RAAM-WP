@@ -21,6 +21,7 @@ SOURCES += \
     controller/audiocontroller.cpp \
     controller/notifier.cpp \
     main.cpp \
+    model/audiosessiongroup.cpp \
     model/client.cpp \
     model/command.cpp \
     model/outputdevice.cpp \
@@ -35,6 +36,7 @@ HEADERS += \
     controller/maincontroller.h \
     controller/audiocontroller.h \
     controller/notifier.h \
+    model/audiosessiongroup.h \
     model/client.h \
     model/command.h \
     model/outputdevice.h \

@@ -12,13 +12,16 @@ OutputDevice::OutputDevice (IMMDevice *pDevice, QObject *parent)
 
 
 OutputDevice::~OutputDevice () {
-    SafeRelease(&pMMDevice);
-    SafeRelease(&pPropertyStore);
     if (pEndpointVolume)
-        // also includes release
         pEndpointVolume->UnregisterControlChangeNotify(systemNotifier);
     if (pEndpointId)
         CoTaskMemFree(pEndpointId);
+    if (pSessManager2)
+        pSessManager2->UnregisterSessionNotification(systemNotifier);
+    SafeRelease(&pEndpointVolume);
+    SafeRelease(&pSessManager2);
+    SafeRelease(&pMMDevice);
+    SafeRelease(&pPropertyStore);
 }
 
 
@@ -127,6 +130,14 @@ EndpointFormFactor OutputDevice::getFormFactor () {
 
 
 HRESULT OutputDevice::init () {
+    IAudioSessionEnumerator *pSessEnumerator = nullptr;
+    IAudioSessionControl *pSessControl = nullptr;
+    int sessionCounter = 0;
+
+    // create the notifier object
+    if (!systemNotifier)
+        systemNotifier = new Notifier(this);
+
     // get the endpointID
     hr = pMMDevice->GetId(&pEndpointId);
     FAILCATCH;
@@ -140,12 +151,9 @@ HRESULT OutputDevice::init () {
         hr = pMMDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_ALL,
                                  nullptr, reinterpret_cast<void**>(&pEndpointVolume));
         FAILCATCH;
-        if (!systemNotifier) {
-            systemNotifier = new Notifier(this);
-            connect(systemNotifier, &Notifier::sigVolumeOrMuteChanged,
-                    this, &OutputDevice::sigVolumeOrMuteChanged,
-                    Qt::QueuedConnection);
-        }
+        connect(systemNotifier, &Notifier::sigVolumeOrMuteChanged,
+                this, &OutputDevice::sigVolumeOrMuteChanged,
+                Qt::QueuedConnection);
         pEndpointVolume->RegisterControlChangeNotify(systemNotifier);
     }
 
@@ -154,21 +162,47 @@ HRESULT OutputDevice::init () {
     FAILCATCH;
 
     // update the properties
+    // (disable prohibits double fault signalling and false updates)
     disableSignalling = true;
     hr = updateDescriptionLong();
     FAILCATCH;
     hr = updateDescriptionShort();
     FAILCATCH;
     hr = updateFormFactor();
-    disableSignalling = false;
+    FAILCATCH;
+
+    // register for new sessions
+    hr = pMMDevice->Activate(__uuidof(IAudioSessionManager2),
+                             CLSCTX_ALL,
+                             nullptr,
+                             reinterpret_cast<void**>(&pSessManager2));
+    FAILCATCH;
+    hr = pSessManager2->RegisterSessionNotification(systemNotifier);
+    FAILCATCH;
+
+    // enumerate all devices
+    hr = pSessManager2->GetSessionEnumerator(&pSessEnumerator);
+    FAILCATCH;
+    hr = pSessEnumerator->GetCount(&sessionCounter);
+    FAILCATCH;
+    for (int i = 0; i < sessionCounter; i++) {
+        SafeRelease(&pSessControl);
+        hr = pSessEnumerator->GetSession(i, &pSessControl);
+        FAILCATCH;
+        addSession(pSessControl);
+    }
 
 done:
+    disableSignalling = false;
     if (!disableSignalling && FAILED(hr))
         sigInternalStatusError(hr);
     else if (!disableSignalling) {
         sigEndpointIdChanged(pEndpointId);
         sigStatusChanged(&state);
     }
+    SafeRelease(&pSessManager2);
+    SafeRelease(&pSessEnumerator);
+    SafeRelease(&pSessControl);
     return hr;
 }
 
@@ -232,5 +266,20 @@ done:
         sigInternalStatusError(hr);
     else if (!disableSignalling)
         sigFormFactorChanged(&formFactor);*/
+    return hr;
+}
+
+
+
+HRESULT OutputDevice::addSession (IAudioSessionControl *control) {
+    hr = S_OK;
+
+    // add to session group, if grouping param is known
+
+    if (!disableSignalling)
+        sigSessionAdded(new AudioSessionGroup(control, this));
+
+    if (!disableSignalling && FAILED(hr))
+        sigInternalStatusError(hr);
     return hr;
 }

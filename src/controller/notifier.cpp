@@ -8,7 +8,8 @@ Notifier::Notifier (QObject* parent)
       propERole(eConsole),
       propLPCWSTR(nullptr),
       propDWORD(0),
-      propPROPERTYKEY(_tagpropertykey()) {
+      propPROPERTYKEY(_tagpropertykey()),
+      propAudioSessionControl(nullptr) {
 }
 
 
@@ -72,8 +73,21 @@ HRESULT __stdcall Notifier::OnPropertyValueChanged (LPCWSTR a, const PROPERTYKEY
 
 
 
-HRESULT __stdcall Notifier::OnNotify(PAUDIO_VOLUME_NOTIFICATION_DATA) {
+HRESULT __stdcall Notifier::OnNotify (PAUDIO_VOLUME_NOTIFICATION_DATA) {
+    mutex.lock();
     sigVolumeOrMuteChanged(this);
+    mutex.unlock();
+    return S_OK;
+}
+
+
+
+HRESULT __stdcall Notifier::OnSessionCreated (IAudioSessionControl *control) {
+    mutex.lock();
+    propAudioSessionControl.set(control);
+    sigSessionCreated(this);
+    resetProperties();
+    mutex.unlock();
     return S_OK;
 }
 
@@ -104,4 +118,5 @@ void Notifier::resetProperties () {
     propLPCWSTR.isSet = false;
     propDWORD.isSet = false;
     propPROPERTYKEY.isSet = false;
+    propAudioSessionControl.isSet = false;
 }

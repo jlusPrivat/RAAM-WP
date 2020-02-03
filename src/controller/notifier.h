@@ -3,6 +3,7 @@
 
 #include <mmdeviceapi.h>
 #include <endpointvolume.h>
+#include <audiopolicy.h>
 #include <QObject>
 #include <QMutex>
 
@@ -16,7 +17,8 @@
  */
 class Notifier: public QObject,
         public IMMNotificationClient,
-        public IAudioEndpointVolumeCallback {
+        public IAudioEndpointVolumeCallback,
+        public IAudioSessionNotification {
     Q_OBJECT
 
 
@@ -40,6 +42,7 @@ public:
     PropWrapper<LPCWSTR> propLPCWSTR;
     PropWrapper<DWORD> propDWORD;
     PropWrapper<PROPERTYKEY> propPROPERTYKEY;
+    PropWrapper<IAudioSessionControl*> propAudioSessionControl;
 
     // For IMMNotificationClient
     HRESULT __stdcall OnDefaultDeviceChanged(EDataFlow, ERole, LPCWSTR) override;
@@ -50,6 +53,9 @@ public:
 
     // for the IAudioEndpointVolumeCallback
     HRESULT __stdcall OnNotify(PAUDIO_VOLUME_NOTIFICATION_DATA) override;
+
+    // for the IAudioSessionNotification
+    HRESULT __stdcall OnSessionCreated(IAudioSessionControl*) override;
 
     // Only for fulfilling the specs - Not doing a thing
     ULONG __stdcall AddRef() override;
@@ -64,6 +70,7 @@ signals:
     void sigDeviceStateChanged(Notifier*);
     void sigPropertyValueChanged(Notifier*);
     void sigVolumeOrMuteChanged(Notifier*);
+    void sigSessionCreated(Notifier*);
 
 
 private:

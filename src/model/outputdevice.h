@@ -3,9 +3,11 @@
 
 #include <QObject>
 #include <mmdeviceapi.h>
+#include <audiopolicy.h>
 #include <endpointvolume.h>
 #include <functiondiscoverykeys_devpkey.h>
 #include "controller/notifier.h"
+#include "model/audiosessiongroup.h"
 #include "utils/SafeRelease.h"
 #include "utils/makros.h"
 
@@ -72,6 +74,8 @@ signals:
     void sigIsDefaultOutputChanged(const bool*);
     void sigFormFactorChanged(const EndpointFormFactor*);
     void sigVolumeOrMuteChanged();
+    void sigSessionAdded(AudioSessionGroup*); // !!! connect
+    void sigSessionRemoved(AudioSessionGroup*); // !!! connect
 
 
 private:
@@ -82,6 +86,7 @@ private:
     IMMDevice *pMMDevice = nullptr;
     IAudioEndpointVolume *pEndpointVolume = nullptr;
     IPropertyStore *pPropertyStore = nullptr;
+    IAudioSessionManager2 *pSessManager2 = nullptr;
 
     // properties
     Notifier *systemNotifier = nullptr;
@@ -96,6 +101,10 @@ private:
     HRESULT updateDescriptionLong();
     HRESULT updateDescriptionShort();
     HRESULT updateFormFactor(); // INOP
+
+
+private slots:
+    HRESULT addSession(IAudioSessionControl*);
 
 
 };
