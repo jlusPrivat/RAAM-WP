@@ -14,9 +14,9 @@ OutputDevice::OutputDevice (IMMDevice *pDevice, QObject *parent)
 OutputDevice::~OutputDevice () {
     SafeRelease(&pMMDevice);
     SafeRelease(&pPropertyStore);
-    SafeRelease(&pEndpointVolume);
     if (pEndpointVolume)
-        pEndpointVolume->UnregisterControlChangeNotify(this);
+        // also includes release
+        pEndpointVolume->UnregisterControlChangeNotify(systemNotifier);
     if (pEndpointId)
         CoTaskMemFree(pEndpointId);
 }
@@ -126,32 +126,6 @@ EndpointFormFactor OutputDevice::getFormFactor () {
 
 
 
-ULONG __stdcall OutputDevice::AddRef () {
-    return 1;
-}
-
-
-
-ULONG __stdcall OutputDevice::Release () {
-    return 0;
-}
-
-
-
-HRESULT __stdcall OutputDevice::QueryInterface (REFIID, void** ppvInterface) {
-    *ppvInterface = nullptr;
-    return E_NOINTERFACE;
-}
-
-
-
-HRESULT __stdcall OutputDevice::OnNotify(PAUDIO_VOLUME_NOTIFICATION_DATA) {
-    sigVolumeOrMuteChanged();
-    return S_OK;
-}
-
-
-
 HRESULT OutputDevice::init () {
     // get the endpointID
     hr = pMMDevice->GetId(&pEndpointId);
@@ -162,11 +136,17 @@ HRESULT OutputDevice::init () {
     FAILCATCH;
 
     // get the endpoint volume
-    if (state == DEVICE_STATE_ACTIVE) {
+    if (state == DEVICE_STATE_ACTIVE && !pEndpointVolume) {
         hr = pMMDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_ALL,
                                  nullptr, reinterpret_cast<void**>(&pEndpointVolume));
         FAILCATCH;
-        pEndpointVolume->RegisterControlChangeNotify(this);
+        if (!systemNotifier) {
+            systemNotifier = new Notifier(this);
+            connect(systemNotifier, &Notifier::sigVolumeOrMuteChanged,
+                    this, &OutputDevice::sigVolumeOrMuteChanged,
+                    Qt::QueuedConnection);
+        }
+        pEndpointVolume->RegisterControlChangeNotify(systemNotifier);
     }
 
     // get the property store
@@ -180,9 +160,9 @@ HRESULT OutputDevice::init () {
     hr = updateDescriptionShort();
     FAILCATCH;
     hr = updateFormFactor();
+    disableSignalling = false;
 
 done:
-    disableSignalling = false;
     if (!disableSignalling && FAILED(hr))
         sigInternalStatusError(hr);
     else if (!disableSignalling) {

@@ -19,6 +19,7 @@ SOURCES += \
     controller/language.cpp \
     controller/maincontroller.cpp \
     controller/audiocontroller.cpp \
+    controller/notifier.cpp \
     main.cpp \
     model/client.cpp \
     model/command.cpp \
@@ -33,6 +34,7 @@ HEADERS += \
     controller/language.h \
     controller/maincontroller.h \
     controller/audiocontroller.h \
+    controller/notifier.h \
     model/client.h \
     model/command.h \
     model/outputdevice.h \

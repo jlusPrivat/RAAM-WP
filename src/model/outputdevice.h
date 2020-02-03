@@ -5,6 +5,7 @@
 #include <mmdeviceapi.h>
 #include <endpointvolume.h>
 #include <functiondiscoverykeys_devpkey.h>
+#include "controller/notifier.h"
 #include "utils/SafeRelease.h"
 #include "utils/makros.h"
 
@@ -25,7 +26,7 @@ DEFINE_PROPERTYKEY(PKEY_Device_DeviceDesc, 0xa45c254e, 0xdf1c, \
  * Audio Endpoint Device. It therefore enables to
  * get some properties and set mute and volume.
  */
-class OutputDevice: public QObject, IAudioEndpointVolumeCallback {
+class OutputDevice: public QObject {
     Q_OBJECT
 
 
@@ -60,12 +61,6 @@ public:
     QString getDescriptionShort();
     EndpointFormFactor getFormFactor();
 
-    // for the IAudioEndpointVolumeCallback
-    ULONG __stdcall AddRef() override;
-    ULONG __stdcall Release() override;
-    HRESULT __stdcall QueryInterface(REFIID, void**) override;
-    HRESULT __stdcall OnNotify(PAUDIO_VOLUME_NOTIFICATION_DATA) override;
-
 
 signals:
     /// sent, whenever an api error occured
@@ -89,6 +84,7 @@ private:
     IPropertyStore *pPropertyStore = nullptr;
 
     // properties
+    Notifier *systemNotifier = nullptr;
     DWORD state = DEVICE_STATE_ACTIVE;
     bool isDefaultOutput = false;
     QString descriptionLong = "";

@@ -1,6 +1,4 @@
 #include <QApplication>
-#include <QTranslator>
-#include "utils/makros.h"
 #include "controller/maincontroller.h"
 
 

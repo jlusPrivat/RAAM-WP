@@ -11,7 +11,8 @@ AudioController::AudioController (QObject *parent)
 
 
 AudioController::~AudioController () {
-    pDeviceEnumerator->UnregisterEndpointNotificationCallback(this);
+    if (systemNotifier)
+        pDeviceEnumerator->UnregisterEndpointNotificationCallback(systemNotifier);
     SafeRelease(&pDeviceEnumerator);
     CoUninitialize();
 }
@@ -25,7 +26,6 @@ HRESULT AudioController::getInternalStatus () {
 
 
 void AudioController::clientCommanded (Client *client, Command &command)  {
-
     if (command.getAction() == "enumDevices") {
         if (command.containsKey("di")) {
             Command c("dev", Command::E_OUTBOUND);
@@ -78,8 +78,10 @@ void AudioController::clientCommanded (Client *client, Command &command)  {
 
 
 
-HRESULT __stdcall AudioController::OnDefaultDeviceChanged (EDataFlow flow,
-                                              ERole role, LPCWSTR deviceId) {
+void AudioController::defaultDeviceChanged (Notifier* notifier) {
+    EDataFlow flow = notifier->propEDataFlow.get();
+    ERole role = notifier->propERole.get();
+    LPCWSTR deviceId = notifier->propLPCWSTR.get();
     // only use incoming data from console and ignore other default outputs
     if (flow == eRender && role == eConsole) {
         // reset old default OutputDevice to non default
@@ -93,78 +95,49 @@ HRESULT __stdcall AudioController::OnDefaultDeviceChanged (EDataFlow flow,
                 device->setIsDefaultOutput(true);
         }
     }
-    return S_OK;
 }
 
 
 
-HRESULT __stdcall AudioController::OnDeviceAdded (LPCWSTR deviceId) {
-    IMMDevice *pNewMMDevice = nullptr;
-    OutputDevice *pNewOutputDevice = nullptr;
-    Command c("dev", Command::E_OUTBOUND);
-
-    // find new device, create object
-    hr = pDeviceEnumerator->GetDevice(deviceId, &pNewMMDevice);
-    FAILCATCH;
-    pNewOutputDevice = new OutputDevice(pNewMMDevice, this);
-    connectDeviceSignals(pNewOutputDevice);
-
-    // check object integrity and insert into list
-    hr = pNewOutputDevice->getInternalStatus();
-    FAILCATCH_DELETE(pNewOutputDevice);
-    outputDevices.append(pNewOutputDevice);
-
-    // inform clients
-    c << "dc" << "ddl" << "dds" << "dff" << "m" << "l";
-    fillCommand(c, pNewOutputDevice);
-    broadcastCommand(c);
-
-done:
-    SafeRelease(&pNewMMDevice);
-    return S_OK;
+void AudioController::deviceAdded (Notifier* notifier) {
+    LPCWSTR deviceId = notifier->propLPCWSTR.get();
+    addDevice(deviceId);
 }
 
 
 
-HRESULT __stdcall AudioController::OnDeviceRemoved (LPCWSTR deviceId) {
-    qDebug() << "!!! devRemoved";
-    OutputDevice *pOutputDevice = nullptr;
-    if (findOutputDevice(deviceId, &pOutputDevice)) {
-        delete(pOutputDevice);
-        outputDevices.removeAll(pOutputDevice);
-        Command c("dev", Command::E_OUTBOUND);
-        c.put("di", QString::fromWCharArray(deviceId));
-        c.put("dc", "0");
-        broadcastCommand(c);
-    }
-    return S_OK;
+void AudioController::deviceRemoved (Notifier* notifier) {
+    LPCWSTR deviceId = notifier->propLPCWSTR.get();
+    removeDevice(deviceId);
 }
 
 
 
-HRESULT __stdcall AudioController::OnDeviceStateChanged (LPCWSTR deviceId, DWORD newState) {
+void AudioController::deviceStateChanged (Notifier* notifier) {
+    LPCWSTR deviceId = notifier->propLPCWSTR.get();
+    DWORD newState = notifier->propDWORD.get();
+
     // only update, if new state is active or unplugged
-    qDebug() << "!!! stateChanged";
     if (newState & (DEVICE_STATE_ACTIVE | DEVICE_STATE_UNPLUGGED)) {
-        qDebug() << "!!! stateStillValid";
         OutputDevice *device = nullptr;
         // update available device
         if (findOutputDevice(deviceId, &device))
             device->setState(newState);
         // create new device
         else
-            OnDeviceAdded(deviceId);
+            addDevice(deviceId);
     }
     // otherwise delete OutputDevice, because it is not present or disabled
     else
-        OnDeviceRemoved(deviceId);
-    return S_OK;
+        removeDevice(deviceId);
 }
 
 
 
-HRESULT __stdcall AudioController::OnPropertyValueChanged (LPCWSTR deviceId,
-                                              const PROPERTYKEY propKey) {
+void AudioController::propertyValueChanged (Notifier* notifier) {
+    LPCWSTR deviceId = notifier->propLPCWSTR.get();
+    const PROPERTYKEY propKey = notifier->propPROPERTYKEY.get();
+
     OutputDevice *device = nullptr;
     // update found device
     if (findOutputDevice(deviceId, &device)) {
@@ -172,32 +145,12 @@ HRESULT __stdcall AudioController::OnPropertyValueChanged (LPCWSTR deviceId,
     }
     // device not found, try recovering from invalid state by adding it
     else
-        OnDeviceAdded(deviceId);
-    return S_OK;
+        addDevice(deviceId);
 }
 
 
 
-ULONG __stdcall AudioController::AddRef () {
-    return 1;
-}
-
-
-
-ULONG __stdcall AudioController::Release () {
-    return 0;
-}
-
-
-
-HRESULT __stdcall AudioController::QueryInterface (REFIID, void** ppvInterface) {
-    *ppvInterface = nullptr;
-    return E_NOINTERFACE;
-}
-
-
-
-void AudioController::connectDeviceSignals(OutputDevice *device) {
+void AudioController::connectDeviceSignals (OutputDevice *device) {
     connect(device, &OutputDevice::sigEndpointIdChanged, this, [=]{
         Command c("enumDevices", Command::E_OUTBOUND);
         broadcastCommand(c);
@@ -292,7 +245,25 @@ HRESULT AudioController::init () {
         outputDevice->setIsDefaultOutput(true);
 
     // register itself as MMNotificationClient
-    pDeviceEnumerator->RegisterEndpointNotificationCallback(this);
+    if (!systemNotifier) {
+        systemNotifier = new Notifier(this);
+        connect(systemNotifier, &Notifier::sigDefaultDeviceChanged,
+                this, &AudioController::defaultDeviceChanged,
+                Qt::BlockingQueuedConnection);
+        connect(systemNotifier, &Notifier::sigDeviceAdded,
+                this, &AudioController::deviceAdded,
+                Qt::BlockingQueuedConnection);
+        connect(systemNotifier, &Notifier::sigDeviceRemoved,
+                this, &AudioController::deviceRemoved,
+                Qt::BlockingQueuedConnection);
+        connect(systemNotifier, &Notifier::sigDeviceStateChanged,
+                this, &AudioController::deviceStateChanged,
+                Qt::BlockingQueuedConnection);
+        connect(systemNotifier, &Notifier::sigPropertyValueChanged,
+                this, &AudioController::propertyValueChanged,
+                Qt::BlockingQueuedConnection);
+        pDeviceEnumerator->RegisterEndpointNotificationCallback(systemNotifier);
+    }
 
 done:
     SafeRelease(&pDefaultDevice);
@@ -314,6 +285,47 @@ bool AudioController::findOutputDevice (LPCWSTR endpointId, OutputDevice **ppOut
         }
     }
     return false;
+}
+
+
+
+void AudioController::addDevice (LPCWSTR deviceId) {
+    IMMDevice *pNewMMDevice = nullptr;
+    OutputDevice *pNewOutputDevice = nullptr;
+    Command c("dev", Command::E_OUTBOUND);
+
+    // find new device, create object
+    hr = pDeviceEnumerator->GetDevice(deviceId, &pNewMMDevice);
+    FAILCATCH;
+    pNewOutputDevice = new OutputDevice(pNewMMDevice, this);
+    connectDeviceSignals(pNewOutputDevice);
+
+    // check object integrity and insert into list
+    hr = pNewOutputDevice->getInternalStatus();
+    FAILCATCH_DELETE(pNewOutputDevice);
+    outputDevices.append(pNewOutputDevice);
+
+    // inform clients
+    c << "dc" << "ddl" << "dds" << "dff" << "m" << "l";
+    fillCommand(c, pNewOutputDevice);
+    broadcastCommand(c);
+
+done:
+    SafeRelease(&pNewMMDevice);
+}
+
+
+
+void AudioController::removeDevice (LPCWSTR deviceId) {
+    OutputDevice *pOutputDevice = nullptr;
+    if (findOutputDevice(deviceId, &pOutputDevice)) {
+        delete(pOutputDevice);
+        outputDevices.removeAll(pOutputDevice);
+        Command c("dev", Command::E_OUTBOUND);
+        c.put("di", QString::fromWCharArray(deviceId));
+        c.put("dc", "0");
+        broadcastCommand(c);
+    }
 }
 
 

@@ -3,6 +3,7 @@
 
 #include <mmdeviceapi.h>
 #include <QList>
+#include "notifier.h"
 #include "utils/SafeRelease.h"
 #include "utils/makros.h"
 #include "model/outputdevice.h"
@@ -17,7 +18,7 @@
  * Manages and creates all OutputDevices, AudioSessionGroups and AudioSessions.
  * Notifies about all changes in the audio system.
  */
-class AudioController: public QObject, IMMNotificationClient {
+class AudioController: public QObject {
     Q_OBJECT
 
 
@@ -27,20 +28,17 @@ public:
     HRESULT getInternalStatus();
     void clientCommanded(Client*, Command&);
 
-    // For IMMNotificationClient
-    HRESULT __stdcall OnDefaultDeviceChanged(EDataFlow, ERole, LPCWSTR) override;
-    HRESULT __stdcall OnDeviceAdded(LPCWSTR) override;
-    HRESULT __stdcall OnDeviceRemoved(LPCWSTR) override;
-    HRESULT __stdcall OnDeviceStateChanged(LPCWSTR, DWORD) override;
-    HRESULT __stdcall OnPropertyValueChanged(LPCWSTR, const PROPERTYKEY) override;
-    // I trust Windows enough not to make weird errors, so just simply ignore methods
-    ULONG __stdcall AddRef() override;
-    ULONG __stdcall Release() override;
-    HRESULT __stdcall QueryInterface(REFIID, void**) override;
-
 
 signals:
     void broadcastCommand(Command&);
+
+
+public slots:
+    void defaultDeviceChanged(Notifier*);
+    void deviceAdded(Notifier*);
+    void deviceRemoved(Notifier*);
+    void deviceStateChanged(Notifier*);
+    void propertyValueChanged(Notifier*);
 
 
 private:
@@ -49,6 +47,7 @@ private:
 
     // pointers
     IMMDeviceEnumerator *pDeviceEnumerator = nullptr;
+    Notifier *systemNotifier = nullptr;
 
     // properties
     QList<OutputDevice*> outputDevices;
@@ -59,6 +58,8 @@ private:
     bool findOutputDevice(LPCWSTR, OutputDevice**);
     bool findOutputDevice(QString, OutputDevice**);
     bool findDefaultOutputDevice(OutputDevice**);
+    void addDevice(LPCWSTR);
+    void removeDevice(LPCWSTR);
     /// Fills the preset attributes for a controller to the desired values
     void fillCommand(Command&, OutputDevice*);
     static QString formFactorToStr(EndpointFormFactor);
