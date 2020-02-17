@@ -1,8 +1,11 @@
-#ifndef AUDIOSESSION_H
-#define AUDIOSESSION_H
+#ifndef AUDIOSESSIONGROUP_H
+#define AUDIOSESSIONGROUP_H
 
 #include <audiopolicy.h>
 #include <QObject>
+#include <QList>
+#include <QUuid>
+#include "audiosession.h"
 #include "utils/SafeRelease.h"
 
 
@@ -12,12 +15,41 @@ class AudioSessionGroup: public QObject {
 
 
 public:
-    // pointers
-    IAudioSessionControl *pSessControl = nullptr;
-
     // methods
     AudioSessionGroup(IAudioSessionControl*, QObject* = nullptr);
-    ~AudioSessionGroup();
+    /// returns even then false, when both guids are GUID_NULL
+    bool compareGroupingParam(GUID);
+    QString getGroupingParam();
+    HRESULT addSession(IAudioSessionControl*);
+    HRESULT addSession(AudioSession*);
+    void removeSession(AudioSession*);
+
+    void setVolume(float);
+    float getVolume();
+    void setMute(bool);
+    bool getMute();
+    QString getDisplayName();
+    QString getIconPath();
+    bool isSystemSoundSession();
+
+
+signals:
+    void sigSessionChangedGroupingParam(AudioSessionGroup*, AudioSession*);
+    void sigVolumeOrMuteChanged(AudioSessionGroup*); // !!! connect
+    void sigLastSessionClosed(AudioSessionGroup*);
+    void sigDisplayNameChanged(AudioSessionGroup*); // !!! connect
+    void sigIconPathChanged(AudioSessionGroup*); // !!! connect
+    void sigErrored(HRESULT);
+
+
+private:
+    // properties
+    HRESULT hr = S_OK;
+    GUID groupingParam = GUID_NULL;
+    QList<AudioSession*> audioSessions;
+
+    // methods
+    void connectAllSignals(AudioSession*);
 
 
 };

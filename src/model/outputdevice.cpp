@@ -26,6 +26,29 @@ OutputDevice::~OutputDevice () {
 
 
 
+bool OutputDevice::findAudioSessionGroup (GUID groupingParam,
+                                          AudioSessionGroup **pAudioSessionGroup) {
+    int sessionCounter = audioSessionGroups.count();
+    for (int i = 0; i < sessionCounter; i++) {
+        AudioSessionGroup *ce = audioSessionGroups.at(i);
+        if (ce->compareGroupingParam(groupingParam)) {
+            *pAudioSessionGroup = ce;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+bool OutputDevice::findAudioSessionGroup(QString groupingParam,
+                                         AudioSessionGroup **pAudioSessionGroup) {
+    GUID p = QUuid::fromString(groupingParam);
+    return findAudioSessionGroup(p, pAudioSessionGroup);
+}
+
+
+
 void OutputDevice::setMute (bool m) {
     pEndpointVolume->SetMute(m, nullptr);
 }
@@ -151,9 +174,9 @@ HRESULT OutputDevice::init () {
         hr = pMMDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_ALL,
                                  nullptr, reinterpret_cast<void**>(&pEndpointVolume));
         FAILCATCH;
-        connect(systemNotifier, &Notifier::sigVolumeOrMuteChanged,
+        connect(systemNotifier, &Notifier::sigDeviceVolumeOrMuteChanged,
                 this, &OutputDevice::sigVolumeOrMuteChanged,
-                Qt::QueuedConnection);
+                Qt::BlockingQueuedConnection);
         pEndpointVolume->RegisterControlChangeNotify(systemNotifier);
     }
 
@@ -180,22 +203,26 @@ HRESULT OutputDevice::init () {
     hr = pSessManager2->RegisterSessionNotification(systemNotifier);
     FAILCATCH;
 
-    // enumerate all devices
+    // enumerate all sessions (if any available)
     hr = pSessManager2->GetSessionEnumerator(&pSessEnumerator);
-    FAILCATCH;
-    hr = pSessEnumerator->GetCount(&sessionCounter);
-    FAILCATCH;
-    for (int i = 0; i < sessionCounter; i++) {
-        SafeRelease(&pSessControl);
-        hr = pSessEnumerator->GetSession(i, &pSessControl);
+    if (pSessEnumerator) {
         FAILCATCH;
-        addSession(pSessControl);
+        hr = pSessEnumerator->GetCount(&sessionCounter);
+        FAILCATCH;
+        for (int i = 0; i < sessionCounter; i++) {
+            SafeRelease(&pSessControl);
+            hr = pSessEnumerator->GetSession(i, &pSessControl);
+            FAILCATCH;
+            addSession(pSessControl);
+        }
     }
+    else
+        hr = S_OK;
 
 done:
     disableSignalling = false;
     if (!disableSignalling && FAILED(hr))
-        sigInternalStatusError(hr);
+        sigErrored(hr);
     else if (!disableSignalling) {
         sigEndpointIdChanged(pEndpointId);
         sigStatusChanged(&state);
@@ -219,7 +246,7 @@ HRESULT OutputDevice::updateDescriptionLong () {
 done:
     PropVariantClear(&propvariant);
     if (!disableSignalling && FAILED(hr))
-        sigInternalStatusError(hr);
+        sigErrored(hr);
     else if (!disableSignalling)
         sigDescriptionLongChanged(&descriptionLong);
     return hr;
@@ -238,7 +265,7 @@ HRESULT OutputDevice::updateDescriptionShort () {
 done:
     PropVariantClear(&propvariant);
     if (!disableSignalling && FAILED(hr))
-        sigInternalStatusError(hr);
+        sigErrored(hr);
     else if (!disableSignalling)
         sigDescriptionShortChanged(&descriptionShort);
     return hr;
@@ -273,13 +300,43 @@ done:
 
 HRESULT OutputDevice::addSession (IAudioSessionControl *control) {
     hr = S_OK;
+    AudioSessionGroup *group = nullptr;
+    GUID sessGuid = GUID_NULL;
 
     // add to session group, if grouping param is known
+    hr = control->GetGroupingParam(&sessGuid);
+    FAILCATCH;
+    if (findAudioSessionGroup(sessGuid, &group))
+        group->addSession(control);
+    else {
+        group = new AudioSessionGroup(control, this);
+        connect(group, &AudioSessionGroup::sigSessionChangedGroupingParam,
+                this, [&](AudioSessionGroup *grp, AudioSession *sess){
+            // reassign a changed session to a correct group
+            grp->removeSession(sess);
+            addSession(sess->control);
+            delete sess;
+        });
+        connect(group, &AudioSessionGroup::sigLastSessionClosed,
+                this, &OutputDevice::removeSessionGroup);
+        connect(group, &AudioSessionGroup::sigErrored,
+                this, &OutputDevice::sigErrored);
+        audioSessionGroups.append(group);
+        if (!disableSignalling)
+            sigSessionGroupAdded(group);
+    }
 
-    if (!disableSignalling)
-        sigSessionAdded(new AudioSessionGroup(control, this));
-
+done:
     if (!disableSignalling && FAILED(hr))
-        sigInternalStatusError(hr);
+        sigErrored(hr);
     return hr;
+}
+
+
+
+void OutputDevice::removeSessionGroup (AudioSessionGroup* group) {
+    if (!disableSignalling)
+        sigSessionGroupRemoved(group);
+    audioSessionGroups.removeAll(group);
+    group->deleteLater();
 }

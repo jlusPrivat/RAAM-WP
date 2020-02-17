@@ -62,6 +62,8 @@ private:
     void removeDevice(LPCWSTR);
     /// Fills the preset attributes for a controller to the desired values
     void fillCommand(Command&, OutputDevice*);
+    /// does not fill "di" key
+    void fillCommand(Command&, AudioSessionGroup*);
     static QString formFactorToStr(EndpointFormFactor);
 
 

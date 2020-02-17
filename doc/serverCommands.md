@@ -50,11 +50,11 @@ The QR Code contains these information in this exact order.
 * **enumDevices**: Sent by the client as a request to receive all devices or detailed information about one particular device. The server responds with one "dev" action per device. Additional optional keys: `di`.
 * **enumDevices**: Sent by the server, implicating all devices may have changed and should be re enumerated by the client.
 * **enumSessions**: Sent by the client as a request to receive all audio sessions or detailed information about one particular session. The server responds with one "sess" action per audio session. Additional optional keys: `si`. Additional required keys: `di`.
-* **enumSessions**:  When sent by the server, all sessions may have changed and should be re enumerated by the client. Additional required keys: `di`.
+* **enumSessions**: When sent by the server, all sessions may have changed and should be re enumerated by the client. Additional required keys: `di`.
 * **dev**: Sent by the client, when changes are supposed to be made. Additional required keys: `di`. Additional optional keys: `m`, `l`.
 * **dev**: Sent by the server, when changes were made to a device, or when "enumDevices" was called, or when a new device was added, or when a device was removed. When a new device was added or when all devices are enumerated, all optional keys become required keys. Additional required keys: `di`, `dc`. Additional optional keys: `ddl`, `dds`, `dff`, `m`, `l`.
 * **sess**: Sent by the client, when changes are supposed to be made. Additional required keys: `si`, `di`. Additional optional keys: `m`, `l`.
-* **sess**: *!!! No description yet*
+* **sess**: Sent by the server, when changes were made to a session, or when "enumSessions" was called, or when a new session was added, or when a session was removed. When a new session was added or when all sessions are enumerated, all optional keys become required keys. Addtional required keys: `di`, `si`. Additional optional keys: `sc`, `sdn`, `m`, `l`
 
 ### Overview of all possible keys
 Key | Description
@@ -72,6 +72,7 @@ Key | Description
 `dds` | "dds" for "device description short".
 `dff` | "dff" for "device form factor". Is one of these values: "RemoteNetworkDevice", "Speakers", "LineLevel", "Headphones", "Microphone", "Headset", "Handset", "UnknownDigitalPassthrough", "SPDIF", "DigitalAudioDisplayDevice", "UnknownFormFactor".
 `si` | "si" for "session id".
-`sdi` | "sdi" for "session display name".
+`sc` | "sc" for "session configuration". Value contains "s", if this session is a system sound session. This value ist just "0", when the session was removed or not found.
+`sdn` | "sdn" for "session display name".
 `m` | "m" for "mute". Can be either `t` for true or `f` for false.
 `l` | "l" for "soundlevel". Any value for the volume between 0 and 100.

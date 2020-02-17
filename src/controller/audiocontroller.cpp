@@ -26,6 +26,7 @@ HRESULT AudioController::getInternalStatus () {
 
 
 void AudioController::clientCommanded (Client *client, Command &command)  {
+    // enumerate all output devices
     if (command.getAction() == "enumDevices") {
         if (command.containsKey("di")) {
             Command c("dev", Command::E_OUTBOUND);
@@ -56,18 +57,69 @@ void AudioController::clientCommanded (Client *client, Command &command)  {
     }
 
     // update device volume or mute
-    if (command.getAction() == "dev") {
+    else if (command.getAction() == "dev") {
         OutputDevice *device = nullptr;
         if (findOutputDevice(command.value("di"), &device)) {
             if (command.containsKey("m"))
                 device->setMute(command.value("m")=="t");
             if (command.containsKey("l")) {
-                int val = command.value("l").toFloat() / 100;
-                if (val >= 0 && val <= 100)
+                float val = command.value("l").toFloat() / 100;
+                if (val >= 0 && val <= 1)
                     device->setVolume(val);
             }
         }
         else {
+            Command c("dev", Command::E_OUTBOUND);
+            c.put("di", command.value("di"));
+            c.put("dc", "0");
+            client->sendCommand(c);
+        }
+    }
+
+    // perform any session operation
+    else if (command.getAction() == "enumSessions" || command.getAction() == "sess") {
+        OutputDevice *device = nullptr;
+        if (findOutputDevice(command.value("di"), &device)) {
+
+            // simply enumerate all sessions with all parameters
+            if (command.getAction() == "enumSessions") {
+                int count = device->audioSessionGroups.count();
+                for (int i = 0; i < count; i++) {
+                    // fill the command
+                    Command c("sess", Command::E_OUTBOUND);
+                    c << "di" << "si" << "sc" << "sdn" << "m" << "l";
+                    fillCommand(c, device);
+                    fillCommand(c, device->audioSessionGroups.at(i));
+                    client->sendCommand(c);
+                }
+            }
+
+            // change the session volume or something like that
+            else if (command.getAction() == "sess") {
+                // find the session
+                AudioSessionGroup *sess = nullptr;
+                if (device->findAudioSessionGroup(command.value("si"), &sess)) {
+                    if (command.containsKey("m"))
+                        sess->setMute(command.value("m")=="t");
+                    if (command.containsKey("l")) {
+                        float val = command.value("l").toFloat() / 100;
+                        if (val >= 0 && val <= 1)
+                            sess->setVolume(val);
+                    }
+                }
+                else {
+                    // session not found
+                    Command c("sess", Command::E_OUTBOUND);
+                    c.put("di", command.value("di"));
+                    c.put("si", command.value("si"));
+                    c.put("sc", "0");
+                    client->sendCommand(c);
+                }
+            }
+
+        }
+        else {
+            // send device not found or removed
             Command c("dev", Command::E_OUTBOUND);
             c.put("di", command.value("di"));
             c.put("dc", "0");
@@ -275,7 +327,8 @@ done:
 
 
 
-bool AudioController::findOutputDevice (LPCWSTR endpointId, OutputDevice **ppOutputDevice) {
+bool AudioController::findOutputDevice (LPCWSTR endpointId,
+                                        OutputDevice **ppOutputDevice) {
     uint count = outputDevices.count();
     for (uint i = 0; i < count; i++) {
         OutputDevice *ce = outputDevices.at(i);
@@ -285,6 +338,16 @@ bool AudioController::findOutputDevice (LPCWSTR endpointId, OutputDevice **ppOut
         }
     }
     return false;
+}
+
+
+
+bool AudioController::findOutputDevice (QString di, OutputDevice **ppOD) {
+    // get the LPCWSTR of the device id
+    wchar_t pDi[di.size() + 1];
+    di.toWCharArray(pDi);
+    pDi[di.size()] = '\0';
+    return findOutputDevice(pDi, ppOD);
 }
 
 
@@ -344,16 +407,6 @@ bool AudioController::findDefaultOutputDevice (OutputDevice **ppOutputDevice) {
 
 
 
-bool AudioController::findOutputDevice (QString di, OutputDevice **ppOD) {
-    // get the LPCWSTR of the device id
-    wchar_t pDi[di.size() + 1];
-    di.toWCharArray(pDi);
-    pDi[di.size()] = '\0';
-    return findOutputDevice(pDi, ppOD);
-}
-
-
-
 void AudioController::fillCommand (Command &command, OutputDevice *device) {
     if (!device) {
         if (command.containsKey("dc"))
@@ -383,6 +436,27 @@ void AudioController::fillCommand (Command &command, OutputDevice *device) {
         command.put("m", device->getMute()?"t":"f");
     if (command.containsKey("l"))
         command.put("l", QString::number(static_cast<int>(device->getVolume()*100)));
+}
+
+
+
+void AudioController::fillCommand (Command &command, AudioSessionGroup *session) {
+    if (!session) {
+        if (command.containsKey("sc"))
+            command.put("sc", "0");
+        return;
+    }
+
+    if (command.containsKey("si"))
+        command.put("si", session->getGroupingParam());
+    if (command.containsKey("sc"))
+        command.put("sc", session->isSystemSoundSession()?"s":"");
+    if (command.containsKey("sdn"))
+        command.put("sdn", session->getDisplayName());
+    if (command.containsKey("m"))
+        command.put("m", session->getMute()?"t":"f");
+    if (command.containsKey("l"))
+        command.put("l", QString::number(static_cast<int>(session->getVolume()*100)));
 }
 
 

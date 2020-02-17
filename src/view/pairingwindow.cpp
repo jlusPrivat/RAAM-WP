@@ -15,7 +15,7 @@ PairingWindow::PairingWindow(QWidget *parent)
     QGroupBox *wGroupQr = new QGroupBox(this);
     wGroupQr->setTitle(tr("Pair using Qr Code"));
     layout->addWidget(wGroupQr);
-    // !!!
+    // !!! add Qr code
 
 
     // the raw information side

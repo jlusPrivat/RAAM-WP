@@ -2,6 +2,7 @@
 #define OUTPUTDEVICE_H
 
 #include <QObject>
+#include <QUuid>
 #include <mmdeviceapi.h>
 #include <audiopolicy.h>
 #include <endpointvolume.h>
@@ -35,6 +36,7 @@ class OutputDevice: public QObject {
 public:
     // properties
     LPWSTR pEndpointId = nullptr;
+    QList<AudioSessionGroup*> audioSessionGroups;
 
     // methods
     /**
@@ -44,6 +46,9 @@ public:
      */
     OutputDevice(IMMDevice*, QObject* = nullptr);
     ~OutputDevice();
+    bool findAudioSessionGroup(GUID, AudioSessionGroup**);
+    bool findAudioSessionGroup(QString, AudioSessionGroup**);
+
     void setMute(bool);
     bool getMute();
     void setVolume(float);
@@ -66,7 +71,7 @@ public:
 
 signals:
     /// sent, whenever an api error occured
-    void sigInternalStatusError(HRESULT); // !!! connect
+    void sigErrored(HRESULT); // !!! connect
     void sigEndpointIdChanged(LPCWSTR);
     void sigStatusChanged(const DWORD*);
     void sigDescriptionLongChanged(const QString*);
@@ -74,8 +79,8 @@ signals:
     void sigIsDefaultOutputChanged(const bool*);
     void sigFormFactorChanged(const EndpointFormFactor*);
     void sigVolumeOrMuteChanged();
-    void sigSessionAdded(AudioSessionGroup*); // !!! connect
-    void sigSessionRemoved(AudioSessionGroup*); // !!! connect
+    void sigSessionGroupAdded(AudioSessionGroup*); // !!! connect
+    void sigSessionGroupRemoved(AudioSessionGroup*); // !!! connect
 
 
 private:
@@ -105,6 +110,7 @@ private:
 
 private slots:
     HRESULT addSession(IAudioSessionControl*);
+    void removeSessionGroup(AudioSessionGroup*);
 
 
 };

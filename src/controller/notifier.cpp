@@ -75,7 +75,7 @@ HRESULT __stdcall Notifier::OnPropertyValueChanged (LPCWSTR a, const PROPERTYKEY
 
 HRESULT __stdcall Notifier::OnNotify (PAUDIO_VOLUME_NOTIFICATION_DATA) {
     mutex.lock();
-    sigVolumeOrMuteChanged(this);
+    sigDeviceVolumeOrMuteChanged(this);
     mutex.unlock();
     return S_OK;
 }
@@ -88,6 +88,55 @@ HRESULT __stdcall Notifier::OnSessionCreated (IAudioSessionControl *control) {
     sigSessionCreated(this);
     resetProperties();
     mutex.unlock();
+    return S_OK;
+}
+
+
+
+HRESULT __stdcall Notifier::OnChannelVolumeChanged (DWORD, float*, DWORD, LPCGUID) {
+    // ignore this event
+    return S_OK;
+}
+
+
+
+HRESULT __stdcall Notifier::OnDisplayNameChanged (LPCWSTR, LPCGUID) {
+    sigSessionDisplayNameChanged();
+    return S_OK;
+}
+
+
+
+HRESULT __stdcall Notifier::OnGroupingParamChanged (LPCGUID, LPCGUID) {
+    sigSessionGroupingParamChanged();
+    return S_OK;
+}
+
+
+
+HRESULT __stdcall Notifier::OnIconPathChanged (LPCWSTR, LPCGUID) {
+    sigSessionIconPathChanged();
+    return S_OK;
+}
+
+
+
+HRESULT __stdcall Notifier::OnSessionDisconnected (AudioSessionDisconnectReason) {
+    sigSessionDisconnected();
+    return S_OK;
+}
+
+
+
+HRESULT __stdcall Notifier::OnSimpleVolumeChanged (float, WINBOOL, LPCGUID) {
+    sigSessionVolumeOrMuteChanged();
+    return S_OK;
+}
+
+
+
+HRESULT __stdcall Notifier::OnStateChanged (AudioSessionState) {
+    sigSessionStateChanged();
     return S_OK;
 }
 

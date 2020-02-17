@@ -18,7 +18,8 @@
 class Notifier: public QObject,
         public IMMNotificationClient,
         public IAudioEndpointVolumeCallback,
-        public IAudioSessionNotification {
+        public IAudioSessionNotification,
+        public IAudioSessionEvents {
     Q_OBJECT
 
 
@@ -57,6 +58,15 @@ public:
     // for the IAudioSessionNotification
     HRESULT __stdcall OnSessionCreated(IAudioSessionControl*) override;
 
+    // for the IAudioSessionEvents
+    HRESULT __stdcall OnChannelVolumeChanged(DWORD, float*, DWORD, LPCGUID) override;
+    HRESULT __stdcall OnDisplayNameChanged(LPCWSTR, LPCGUID) override;
+    HRESULT __stdcall OnGroupingParamChanged(LPCGUID, LPCGUID) override;
+    HRESULT __stdcall OnIconPathChanged(LPCWSTR, LPCGUID) override;
+    HRESULT __stdcall OnSessionDisconnected(AudioSessionDisconnectReason) override;
+    HRESULT __stdcall OnSimpleVolumeChanged(float, WINBOOL, LPCGUID) override;
+    HRESULT __stdcall OnStateChanged(AudioSessionState) override;
+
     // Only for fulfilling the specs - Not doing a thing
     ULONG __stdcall AddRef() override;
     ULONG __stdcall Release() override;
@@ -69,8 +79,14 @@ signals:
     void sigDeviceRemoved(Notifier*);
     void sigDeviceStateChanged(Notifier*);
     void sigPropertyValueChanged(Notifier*);
-    void sigVolumeOrMuteChanged(Notifier*);
+    void sigDeviceVolumeOrMuteChanged(Notifier*);
     void sigSessionCreated(Notifier*);
+    void sigSessionDisplayNameChanged();
+    void sigSessionGroupingParamChanged();
+    void sigSessionIconPathChanged();
+    void sigSessionDisconnected();
+    void sigSessionVolumeOrMuteChanged();
+    void sigSessionStateChanged();
 
 
 private:

@@ -21,6 +21,10 @@ bool Command::isValid () {
             return true;
         if (getAction() == "dev" && containsKey("di"))
             return true;
+        if (getAction() == "enumSessions" && containsKey("di"))
+            return true;
+        if (getAction() == "sess" && containsKey("si") && containsKey("di"))
+            return true;
     }
 
     // Outbound direction
@@ -37,6 +41,10 @@ bool Command::isValid () {
         if (getAction() == "enumDevices")
             return true;
         if (getAction() == "dev" && containsKey("di") && containsKey("dc"))
+            return true;
+        if (getAction() == "enumSessions" && containsKey("di"))
+            return true;
+        if (getAction() == "sess" && containsKey("si") && containsKey("di"))
             return true;
     }
 
