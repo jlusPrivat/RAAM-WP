@@ -35,10 +35,10 @@ public:
 
 signals:
     void sigSessionChangedGroupingParam(AudioSessionGroup*, AudioSession*);
-    void sigVolumeOrMuteChanged(AudioSessionGroup*); // !!! connect
+    void sigVolumeOrMuteChanged(AudioSessionGroup*);
     void sigLastSessionClosed(AudioSessionGroup*);
-    void sigDisplayNameChanged(AudioSessionGroup*); // !!! connect
-    void sigIconPathChanged(AudioSessionGroup*); // !!! connect
+    void sigDisplayNameChanged(AudioSessionGroup*);
+    void sigIconPathChanged(AudioSessionGroup*);
     void sigErrored(HRESULT);
 
 

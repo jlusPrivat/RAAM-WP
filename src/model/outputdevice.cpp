@@ -200,6 +200,10 @@ HRESULT OutputDevice::init () {
                              nullptr,
                              reinterpret_cast<void**>(&pSessManager2));
     FAILCATCH;
+    connect(systemNotifier, &Notifier::sigSessionCreated,
+            this, [=](Notifier *n){
+        addSession(n->propAudioSessionControl.get());
+    }, Qt::BlockingQueuedConnection);
     hr = pSessManager2->RegisterSessionNotification(systemNotifier);
     FAILCATCH;
 
@@ -317,8 +321,14 @@ HRESULT OutputDevice::addSession (IAudioSessionControl *control) {
             addSession(sess->control);
             delete sess;
         });
+        connect(group, &AudioSessionGroup::sigVolumeOrMuteChanged,
+                this, &OutputDevice::sigSessionVolumeOrMuteChanged);
         connect(group, &AudioSessionGroup::sigLastSessionClosed,
                 this, &OutputDevice::removeSessionGroup);
+        connect(group, &AudioSessionGroup::sigDisplayNameChanged,
+                this, &OutputDevice::sigSessionDisplayNameChanged);
+        connect(group, &AudioSessionGroup::sigIconPathChanged,
+                this, &OutputDevice::sigSessionIconChanged);
         connect(group, &AudioSessionGroup::sigErrored,
                 this, &OutputDevice::sigErrored);
         audioSessionGroups.append(group);

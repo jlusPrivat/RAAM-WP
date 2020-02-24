@@ -79,8 +79,11 @@ signals:
     void sigIsDefaultOutputChanged(const bool*);
     void sigFormFactorChanged(const EndpointFormFactor*);
     void sigVolumeOrMuteChanged();
-    void sigSessionGroupAdded(AudioSessionGroup*); // !!! connect
-    void sigSessionGroupRemoved(AudioSessionGroup*); // !!! connect
+    void sigSessionGroupAdded(AudioSessionGroup*);
+    void sigSessionGroupRemoved(AudioSessionGroup*);
+    void sigSessionVolumeOrMuteChanged(AudioSessionGroup*);
+    void sigSessionDisplayNameChanged(AudioSessionGroup*);
+    void sigSessionIconChanged(AudioSessionGroup*);
 
 
 private:

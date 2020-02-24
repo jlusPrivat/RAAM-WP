@@ -87,7 +87,7 @@ void AudioController::clientCommanded (Client *client, Command &command)  {
                 for (int i = 0; i < count; i++) {
                     // fill the command
                     Command c("sess", Command::E_OUTBOUND);
-                    c << "di" << "si" << "sc" << "sdn" << "m" << "l";
+                    c << "di" << "si" << "sc" << "sdn" << "sic" << "m" << "l";
                     fillCommand(c, device);
                     fillCommand(c, device->audioSessionGroups.at(i));
                     client->sendCommand(c);
@@ -192,12 +192,8 @@ void AudioController::propertyValueChanged (Notifier* notifier) {
 
     OutputDevice *device = nullptr;
     // update found device
-    if (findOutputDevice(deviceId, &device)) {
+    if (findOutputDevice(deviceId, &device))
         device->updateProperty(propKey);
-    }
-    // device not found, try recovering from invalid state by adding it
-    else
-        addDevice(deviceId);
 }
 
 
@@ -209,6 +205,7 @@ void AudioController::connectDeviceSignals (OutputDevice *device) {
     });
     connect(device, &OutputDevice::sigStatusChanged, this, [=]{
         // ask for full reload, because a previously active could be unplugged
+        // or vice versa
         Command c("enumDevices", Command::E_OUTBOUND);
         broadcastCommand(c);
     });
@@ -235,6 +232,42 @@ void AudioController::connectDeviceSignals (OutputDevice *device) {
     connect(device, &OutputDevice::sigVolumeOrMuteChanged, this, [=]{
         Command c("dev", Command::E_OUTBOUND);
         fillCommand(c << "di" << "dc" << "l" << "m", device);
+        broadcastCommand(c);
+    });
+    connect(device, &OutputDevice::sigSessionGroupAdded,
+            this, [=](AudioSessionGroup *grp){
+        Command c("sess", Command::E_OUTBOUND);
+        fillCommand(c << "di" << "si" << "sc" << "sdn" << "sic" << "m" << "l", device);
+        fillCommand(c, grp);
+        broadcastCommand(c);
+    });
+    connect(device, &OutputDevice::sigSessionGroupRemoved,
+            this, [=](AudioSessionGroup *grp){
+        Command c("sess", Command::E_OUTBOUND);
+        fillCommand(c << "di" << "si", device);
+        fillCommand(c, grp);
+        c.put("sc", "0");
+        broadcastCommand(c);
+    });
+    connect(device, &OutputDevice::sigSessionVolumeOrMuteChanged,
+            this, [=](AudioSessionGroup *grp){
+        Command c("sess", Command::E_OUTBOUND);
+        fillCommand(c << "di" << "si" << "m" << "l", device);
+        fillCommand(c, grp);
+        broadcastCommand(c);
+    });
+    connect(device, &OutputDevice::sigSessionDisplayNameChanged,
+            this, [=](AudioSessionGroup *grp){
+        Command c("sess", Command::E_OUTBOUND);
+        fillCommand(c << "di" << "si" << "sdn" , device);
+        fillCommand(c, grp);
+        broadcastCommand(c);
+    });
+    connect(device, &OutputDevice::sigSessionIconChanged,
+            this, [=](AudioSessionGroup *grp){
+        Command c("sess", Command::E_OUTBOUND);
+        fillCommand(c << "di" << "si" << "sic", device);
+        fillCommand(c, grp);
         broadcastCommand(c);
     });
 }
@@ -369,9 +402,11 @@ void AudioController::addDevice (LPCWSTR deviceId) {
     outputDevices.append(pNewOutputDevice);
 
     // inform clients
-    c << "dc" << "ddl" << "dds" << "dff" << "m" << "l";
-    fillCommand(c, pNewOutputDevice);
-    broadcastCommand(c);
+    if (!disableSignalling) {
+        c << "di" << "dc" << "ddl" << "dds" << "dff" << "m" << "l";
+        fillCommand(c, pNewOutputDevice);
+        broadcastCommand(c);
+    }
 
 done:
     SafeRelease(&pNewMMDevice);
@@ -382,12 +417,14 @@ done:
 void AudioController::removeDevice (LPCWSTR deviceId) {
     OutputDevice *pOutputDevice = nullptr;
     if (findOutputDevice(deviceId, &pOutputDevice)) {
-        delete(pOutputDevice);
+        pOutputDevice->deleteLater();
         outputDevices.removeAll(pOutputDevice);
-        Command c("dev", Command::E_OUTBOUND);
-        c.put("di", QString::fromWCharArray(deviceId));
-        c.put("dc", "0");
-        broadcastCommand(c);
+        if (!disableSignalling) {
+            Command c("dev", Command::E_OUTBOUND);
+            c.put("di", QString::fromWCharArray(deviceId));
+            c.put("dc", "0");
+            broadcastCommand(c);
+        }
     }
 }
 
@@ -453,6 +490,8 @@ void AudioController::fillCommand (Command &command, AudioSessionGroup *session)
         command.put("sc", session->isSystemSoundSession()?"s":"");
     if (command.containsKey("sdn"))
         command.put("sdn", session->getDisplayName());
+    if (command.containsKey("sic"))
+        command.put("sic", "");
     if (command.containsKey("m"))
         command.put("m", session->getMute()?"t":"f");
     if (command.containsKey("l"))

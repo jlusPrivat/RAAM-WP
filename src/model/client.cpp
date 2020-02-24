@@ -262,10 +262,9 @@ void Client::sendCommand (Command &command) {
         return;
 
     // filter the command, if device and not interesting for client
-    if (command.getAction() == "dev"
-            && ((onlyPluggedInDevices && !command.value("dc").contains("a"))
-                || (!onlyPluggedInDevices && !command.value("dc").contains("u")
-                    && !command.value("dc").contains("a"))))
+    if (command.getAction() == "dev" && onlyPluggedInDevices
+            && !command.value("dc").contains("a")
+            && command.value("dc").compare("0"))
         return;
 
     QByteArray cByteArray = command.serialize(true).toUtf8();
