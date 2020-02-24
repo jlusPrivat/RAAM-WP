@@ -8,6 +8,7 @@
 #include <QtNetwork>
 #include <QTcpServer>
 #include <QTimer>
+#include <QLockFile>
 #include "audiocontroller.h"
 #include "language.h"
 #include "model/client.h"
@@ -65,6 +66,7 @@ public:
 
 private:
     // properties
+    QLockFile lockFile;
     MainWindow *w = nullptr;
     QTranslator *translator = new QTranslator(this);
     QSettings *qSettings = nullptr;

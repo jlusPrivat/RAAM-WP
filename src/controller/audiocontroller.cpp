@@ -198,7 +198,22 @@ void AudioController::propertyValueChanged (Notifier* notifier) {
 
 
 
+void AudioController::displayHresultError (HRESULT hresult) {
+    QString msg = QString::fromWCharArray(_com_error(hresult).ErrorMessage());
+    QMessageBox box;
+    box.setWindowTitle(tr("Backend Error"));
+    box.setText(tr("A critical error occured in the backend. If this "
+                   "error continues to pop up, please contact the developer."));
+    box.setDetailedText(msg);
+    box.setIcon(QMessageBox::Critical);
+    box.exec();
+}
+
+
+
 void AudioController::connectDeviceSignals (OutputDevice *device) {
+    connect(device, &OutputDevice::sigErrored,
+            this, &AudioController::displayHresultError);
     connect(device, &OutputDevice::sigEndpointIdChanged, this, [=]{
         Command c("enumDevices", Command::E_OUTBOUND);
         broadcastCommand(c);

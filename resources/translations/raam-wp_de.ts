@@ -9,6 +9,17 @@
     </message>
 </context>
 <context>
+    <name>AudioController</name>
+    <message>
+        <source>Backend Error</source>
+        <translation>Hintergrundfehler</translation>
+    </message>
+    <message>
+        <source>A critical error occured in the backend. If this error continues to pop up, please contact the developer.</source>
+        <translation>im Hintergrund ist ein kritischer Fehler aufgetreten. Bitte den Entwickler kontaktieren, sollte dieser Fehler weiterhin auftreten.</translation>
+    </message>
+</context>
+<context>
     <name>ClientView</name>
     <message>
         <source>Client configuration</source>
@@ -147,6 +158,14 @@ Keine HMACs oder Zeitstempel werden kontrolliert.</translation>
     <message>
         <source>&quot;%1&quot; unpaired</source>
         <translation>&quot;%1&quot; getrennt</translation>
+    </message>
+    <message>
+        <source>Application already running</source>
+        <translation>Anwendung bereits ausgeführt</translation>
+    </message>
+    <message>
+        <source>This application is already running in another instance</source>
+        <translation>Diese Anwendung wird bereits in einer anderen Instanz ausgeführt</translation>
     </message>
 </context>
 <context>

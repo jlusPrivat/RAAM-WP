@@ -1,8 +1,10 @@
 #ifndef AUDIOMANAGER_H
 #define AUDIOMANAGER_H
 
-#include <mmdeviceapi.h>
 #include <QList>
+#include <QMessageBox>
+#include <mmdeviceapi.h>
+#include <comdef.h>
 #include "notifier.h"
 #include "utils/SafeRelease.h"
 #include "utils/makros.h"
@@ -39,6 +41,7 @@ public slots:
     void deviceRemoved(Notifier*);
     void deviceStateChanged(Notifier*);
     void propertyValueChanged(Notifier*);
+    void displayHresultError(HRESULT);
 
 
 private:

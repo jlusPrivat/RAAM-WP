@@ -71,7 +71,7 @@ public:
 
 signals:
     /// sent, whenever an api error occured
-    void sigErrored(HRESULT); // !!! connect
+    void sigErrored(HRESULT);
     void sigEndpointIdChanged(LPCWSTR);
     void sigStatusChanged(const DWORD*);
     void sigDescriptionLongChanged(const QString*);

@@ -3,7 +3,7 @@
 
 
 MainController::MainController (QObject *parent)
-    : QObject(parent) {
+    : QObject(parent), lockFile(QDir::temp().absoluteFilePath("RAAM-WP.lock")) {
     // load the settings
     qSettings = new QSettings("jlus-privat", "RAAM-WP", this);
 
@@ -13,6 +13,17 @@ MainController::MainController (QObject *parent)
                     "raam-wp", "_", ":/translations");
     qApp->installTranslator(translator);
     updateLanguageController(configuredLanguage);
+
+    // check, if an instance is already running
+    if (!lockFile.tryLock(100)) {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle(tr("Application already running"));
+        msgBox.setText(tr("This application is already running in another instance"));
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+        exit(0);
+        return;
+    }
 
     // create the window
     w = new MainWindow();
@@ -202,10 +213,9 @@ void MainController::broadcastCommand (Command &command) {
 
 
 void MainController::parseCloseRequest (bool force) {
-    if (force || !readSetting(E_KEEPINTRAY).toBool()) {
+    if (force || !readSetting(E_KEEPINTRAY).toBool())
         // fully close application
         qApp->quit();
-    }
     else {
         // just minimize to tray
         w->trayIcon->show();
