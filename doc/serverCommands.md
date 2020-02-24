@@ -7,8 +7,6 @@ functionalities provided by this program.
 
 **Note, that any application using the RAAM server commands, partially or as a whole, must be licensed under GNU General Public License v3.0**
 
-**Note, that all specs descriped here are still pending and should not be used for development. This line will be removed, as soon, as the specs are ready to use.**
-
 ## Pairing Client and Server
 When a client (like Smartphone) wants to connect to a server (like Windows PC),
 it has to retrieve the information needed to connect as an authenticated client.

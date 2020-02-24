@@ -3,7 +3,7 @@
 
 #define SOFTWARE_NAME "RAAM-WP"
 
-#define VERSION "0.0.0 NONFINAL"
+#define VERSION "1.0.0"
 
 #define SPECS_VERSION "1.0.0"
 
