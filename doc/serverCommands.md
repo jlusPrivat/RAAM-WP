@@ -1,4 +1,4 @@
-# Specs Version 1.0.0
+# Specs Version 1.0.1
 
 # Server Commands
 This guide describes the usage of the RAAM-WP tcp socket server.
@@ -18,8 +18,8 @@ The client can then save those connection information and use them to connect at
 Any suitable error correction level is allowed.  
 The QR Code contains these information in this exact order.  
 * Server ID (Null terminated ascii character string; Max 25 characters; RegEx: [a-zA-Z][a-zA-Z0-9 _\-]{1,23}[a-zA-Z0-9])
-* Server Software (Null terminated, ascii character string representing the name of the software e.g. "RAAM-WP")
-* Server software version. (Null terminated, ascii character string; Semantic Versioning)
+* Server software (Null terminated, ascii character string representing the name of the software e.g. "RAAM-WP")
+* Server software version (Null terminated, ascii character string; Semantic Versioning)
 * Server IP adress (4x 8 bit unsigned integer in left-to-right order; Big Endian style; Only IPv4)
 * Server port (unsigned 16 bit integer, range 1024..65535)
 * Client ID (Null terminated ascii character string; Max 25 characters; RegEx: [a-z][a-z0-9 _\\-]{1,23}[a-z0-9])
