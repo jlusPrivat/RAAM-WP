@@ -63,4 +63,4 @@ TRANSLATIONS += \
     "$$PWD\..\resources\translations\raam-wp_de.ts"
 
 RC_ICONS = "$$PWD\..\resources\imgs\logo.ico"
-VERSION = 1.0.0.0
+VERSION = 1.0.1.0
