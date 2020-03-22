@@ -3,9 +3,9 @@
 
 #define SOFTWARE_NAME "RAAM-WP"
 
-#define VERSION "1.0.0"
+#define VERSION "1.0.1"
 
-#define SPECS_VERSION "1.0.0"
+#define SPECS_VERSION "1.0.1"
 
 #define VERSION_DESCRIPTION_URL \
     "https://jlus.de/projekte/downloads/raam/raam-wp_version_description"

@@ -3,7 +3,8 @@
 
 
 PairingWindow::PairingWindow(QWidget *parent)
-    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint) {
+    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint |
+              Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint) {
     // configure the window
     setModal(false);
     setAttribute(Qt::WA_DeleteOnClose, true);
@@ -81,13 +82,4 @@ void PairingWindow::generateQr (QByteArray) {
 
 void PairingWindow::show () {
     QWidget::show();
-}
-
-
-
-void PairingWindow::changeEvent (QEvent *event) {
-    if (event->type() == QEvent::ActivationChange) {
-        if (!this->isActiveWindow())
-            close();
-    }
 }

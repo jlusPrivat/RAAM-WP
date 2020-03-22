@@ -29,7 +29,7 @@ AboutView::AboutView (QWidget *parent)
     lbl->setWordWrap(true);
     lbl->setTextFormat(Qt::RichText);
     lbl->setOpenExternalLinks(true);
-    lbl->setText(tr("<b>Remote Application Audio Program</b> "
+    lbl->setText(tr("<b>Remote Application Audio Mixer - Windows Program</b> "
                     "(RAAM-WP), developed by <a href=\"https://jlus.de\">"
                     "Jonathan Lusky</a> as <a href=\"https://example.org\">"
                     "bachelor's thesis</a>."

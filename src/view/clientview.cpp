@@ -52,19 +52,14 @@ ClientView::ClientView (QWidget *parent)
     wConfScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     wConfScroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     layout->addWidget(wConfScroll);
-    QVBoxLayout *lConfScroll = new QVBoxLayout(wConfScroll);
-
-    // add the right sided dialog
-    QGroupBox *wConfBox = new QGroupBox(wConfScroll);
-    wConfBox->setTitle(tr("Client configuration"));
-    wConfScroll->setWidget(wConfBox);
 
     // add the conf box
-    wConfDiag = new QWidget(wConfBox);
-    lConfScroll->addWidget(wConfDiag);
+    wConfDiag = new QGroupBox(wConfScroll);
+    wConfDiag->setTitle(tr("Client configuration"));
+    wConfScroll->setWidget(wConfDiag);
     QFormLayout *lConfDiag = new QFormLayout(wConfDiag);
     lConfDiag->setSpacing(12);
-    lConfDiag->setContentsMargins(4, 12, 4, 4);
+    lConfDiag->setContentsMargins(4, 4, 4, 4);
 
     // add client ID and its icon
     QWidget *wConfClientId = new QWidget(wConfDiag);

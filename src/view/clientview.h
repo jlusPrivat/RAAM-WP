@@ -31,7 +31,7 @@ public:
     QPushButton *listBtnAdd = nullptr;
     QPushButton *listBtnRemove = nullptr;
 
-    QWidget *wConfDiag = nullptr;
+    QGroupBox *wConfDiag = nullptr;
     QLineEdit *confClientId = nullptr;
     QCheckBox *confActive = nullptr;
     QPlainTextEdit *confDescription = nullptr;

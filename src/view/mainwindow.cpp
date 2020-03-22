@@ -7,8 +7,8 @@ MainWindow::MainWindow (QWidget *parent)
     // set the main windows config
     setObjectName("mainWindow");
     setWindowTitle("Remote Application Audio Mixer");
-    setMinimumSize(680, 370);
-    resize(680, 370);
+    setMinimumSize(600, 300);
+    resize(680, 400);
 
     // add the TabWidget
     QWidget *centralWidget = new QWidget(this);
