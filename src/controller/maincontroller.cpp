@@ -509,6 +509,12 @@ void MainController::addNewClient () {
     newClient->generateSecretKey();
     newClient->saveConfig();
     clients.append(newClient);
+
+    // add the listeners for the newly created client
+    connect(newClient, &Client::sigCommanded,
+            this, &MainController::clientCommanded);
+    connect(newClient, &Client::sigPairedChanged,
+            this, &MainController::clientPairedChanged);
 }
 
 
