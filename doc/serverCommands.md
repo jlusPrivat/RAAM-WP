@@ -29,7 +29,7 @@ The QR Code contains these information in this exact order.
 ## Establishing a connection
 ### About TCP/BLE messages
 * Following specifications describe both ways of communication.
-* TCP / BLE messages consist of Null terminated UTF-8 Character Strings. (Null termination before HMAC)
+* TCP / BLE messages consist of Line-Feed ('\n') terminated UTF-8 Character Strings. (Null termination before HMAC)
 * Every TCP/BLE message is key-value based in form of: `key1="value1";key2="value2";` for every type of value. No key may be used more than once in a single message.
 * Only error messages do not come as key-value based messages.
 * Values containing a `"` character are prohibited and lead to the message being rejected.
