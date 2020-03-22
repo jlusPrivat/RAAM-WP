@@ -29,7 +29,7 @@ The QR Code contains these information in this exact order.
 ## Establishing a connection
 ### About TCP/BLE messages
 * Following specifications describe both ways of communication.
-* TCP / BLE messages consist of Line-Feed ('\n') terminated UTF-8 Character Strings. (Null termination before HMAC)
+* TCP / BLE messages consist of Line-Feed (`\n`) terminated UTF-8 Character Strings. (Null termination before HMAC)
 * Every TCP/BLE message is key-value based in form of: `key1="value1";key2="value2";` for every type of value. No key may be used more than once in a single message.
 * Only error messages do not come as key-value based messages.
 * Values containing a `"` character are prohibited and lead to the message being rejected.
@@ -50,9 +50,9 @@ The QR Code contains these information in this exact order.
 * **enumSessions**: Sent by the client as a request to receive all audio sessions or detailed information about one particular session. The server responds with one "sess" action per audio session. Additional optional keys: `si`. Additional required keys: `di`.
 * **enumSessions**: When sent by the server, all sessions may have changed and should be re enumerated by the client. Additional required keys: `di`.
 * **dev**: Sent by the client, when changes are supposed to be made. Additional required keys: `di`. Additional optional keys: `m`, `l`.
-* **dev**: Sent by the server, when changes were made to a device, or when "enumDevices" was called, or when a new device was added, or when a device was removed. When a new device was added or when all devices are enumerated, all optional keys become required keys. Additional required keys: `di`, `dc`. Additional optional keys: `ddl`, `dds`, `dff`, `m`, `l`.
+* **dev**: Sent by the server, when changes were made to a device, or when "enumDevices" was called, or when a new device was added, or when a device was removed. When a new device was added or when "enumDevices" was called, all optional keys become required keys. Additional required keys: `di`, `dc`. Additional optional keys: `ddl`, `dds`, `dff`, `m`, `l`.
 * **sess**: Sent by the client, when changes are supposed to be made. Additional required keys: `si`, `di`. Additional optional keys: `sic`, `m`, `l`.
-* **sess**: Sent by the server, when changes were made to a session, or when "enumSessions" was called, or when a new session was added, or when a session was removed. When a new session was added or when all sessions are enumerated, all optional keys become required keys. Addtional required keys: `di`, `si`. Additional optional keys: `sc`, `sdn`, `sic`, `m`, `l`
+* **sess**: Sent by the server, when changes were made to a session, or when "enumSessions" was called, or when a new session was added, or when a session was removed. When a new session was added or "enumSessions" was called, all optional keys become required keys. Additional required keys: `di`, `si`. Additional optional keys: `sc`, `sdn`, `sic`, `m`, `l`.
 
 ### Overview of all possible keys
 Key | Description
