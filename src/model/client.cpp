@@ -221,6 +221,8 @@ void Client::processIncomingMessage (QString message, QByteArray hmac) {
         if (qFabs(sentTime - unixTime) > 30
                 || sentTime < lastTimestamp) {
             sendCommand("INVALID_TIMESTAMP");
+            if (map->value("a", "") == "init")
+                unpair();
             return;
         }
         lastTimestamp = sentTime;
@@ -231,6 +233,8 @@ void Client::processIncomingMessage (QString message, QByteArray hmac) {
         QByteArray receivedHmac = hmac;
         if (correctHmac.result() != receivedHmac) {
             sendCommand("WRONG_HMAC");
+            if (map->value("a", "") == "init")
+                unpair();
             return;
         }
     }
@@ -278,11 +282,14 @@ void Client::sendCommand (Command &command) {
         cByteArray.append("\n");
 
     currentPairing->write(cByteArray);
+    currentPairing->flush();
 }
 
 
 
 void Client::sendCommand (QString command) {
-    if (currentPairing)
+    if (currentPairing) {
         currentPairing->write(command.toUtf8());
+        currentPairing->flush();
+    }
 }
