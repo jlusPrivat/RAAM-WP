@@ -2,13 +2,16 @@
 Remote Application Audio Mixer - Windows Program
 
 RAAM is a collection of softwares that enable users to remotely control audio
-settings via a network connection. It may be useful for Windows users, who
-intend to level their games volume with the volume of a communication software
-without switching to sndvol. RAAM is devided into multiple softwares:
+settings via a network or usb connection. This includes the control the volume
+and mute states of connected audio endpoint devices and audio sessions. It may
+be useful for Windows users, who intend to level their games volume with
+the volume of a communication software without switching to sndvol.
+RAAM is devided into multiple softwares:
 	
 * **RAAM-WP**: RAAM - Windows Program is the server software, to which a
 client can connect, to be able to change the session and device volumes.
-Only combatible with Windows 10.
+Only combatible with Windows 10. You can download the most recent version
+[here on github](https://github.com/jlusPrivat/RAAM-WP/releases).
 * **RAAM-LP**: RAAM - Linux Program is the server software, to which a
 client can connect, to be able to change the session and device volumes.
 *Not in development yet*
@@ -16,10 +19,9 @@ client can connect, to be able to change the session and device volumes.
 the volumes can be remotely managed. *Not in development yet*
 * **RAAM-IA**: RAAM - iOS Application is client software, with which
 the volumes can be remotely managed. *Not in development yet*
+* **RAAM-MD**: RAAM - Mixing Desk is a physical desk for immediate access
+to the sound session controls.
 
-
-## How to use
-*Currently there are no ready to use applications.*
 
 
 ## How to contribute
@@ -63,10 +65,6 @@ translation files. That help keeping a clean git track.
 
 If any assistance is required, to not hesitate to contact me.
 
-### Useful resources
-* [Microsoft Core Audio APIs](https://docs.microsoft.com/en-us/windows/win32/coreaudio/core-audio-apis-in-windows-vista)
-* (*My Bachelors thesis on this subject in German is still pending*)
-
 ### Checklist for publishing a release
 1. Set Version in `src/utils/makros.h`
 2. Set Version in `src/RAAM-WP.pro`
@@ -75,3 +73,9 @@ If any assistance is required, to not hesitate to contact me.
 5. Tag current git master commit with version number
 6. Add GitHub release with binaries
 7. Change Version on version check server
+
+
+
+## Useful resources
+* [Microsoft Core Audio APIs](https://docs.microsoft.com/en-us/windows/win32/coreaudio/core-audio-apis-in-windows-vista)
+

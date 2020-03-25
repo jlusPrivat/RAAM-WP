@@ -1,4 +1,4 @@
-# Specs Version 1.0.1
+# Specs Version 1.0.2
 
 # Server Commands
 This guide describes the usage of the RAAM-WP tcp socket server.
@@ -7,14 +7,24 @@ functionalities provided by this program.
 
 **Note, that any application using the RAAM server commands, partially or as a whole, must be licensed under GNU General Public License v3.0**
 
-## Pairing Client and Server
-When a client (like Smartphone) wants to connect to a server (like Windows PC),
+## Establishing a connection
+### About TCP/BLE messages
+Following specifications describe both ways of communication.
+* TCP / BLE messages consist of Line-Feed (`\n`) terminated UTF-8 Character Strings (termination before HMAC).
+* Every TCP/BLE message is key-value based in form of: `key1="value1";key2="value2";` for every type of value. No key may be used more than once in a single message.
+* Only error messages do not come as key-value based messages.
+* Values containing a `"` character are prohibited and lead to the message being rejected.
+* Every Message has to have the 32 bytes of the HMAC (using sha256) appended in raw binary form. The HMAC is generated from the entire message, excluding only the HMAC itself. If the HMAC is wrong, "WRONG_HMAC" will be returned. This is optional, when debug mode is enabled.
+* Rejected messages will be fully ignored, unless a specific error message is returned.
+* Further rules regarding the messages must be extracted from the following section.
+
+### About QR Code for TCP connections
+When a client (like Smartphone) wants to connect to a server using TCP (like Windows PC),
 it has to retrieve the information needed to connect as an authenticated client.
-It is easiest to get those information through scanning the qr code. Alternatively
+It is easiest to get those information through scanning the QR code. Alternatively
 a client should provide an interface to manually input these data.
 The client can then save those connection information and use them to connect at any time.
 
-### Reading the QR Code
 Any suitable error correction level is allowed.  
 The QR Code contains these information in this exact order.  
 * Server ID (Null terminated ascii character string; Max 25 characters; RegEx: [a-zA-Z][a-zA-Z0-9 _\-]{1,23}[a-zA-Z0-9])
@@ -25,17 +35,8 @@ The QR Code contains these information in this exact order.
 * Client ID (Null terminated ascii character string; Max 25 characters; RegEx: [a-z][a-z0-9 _\\-]{1,23}[a-z0-9])
 * Client specific hmac shared secret (64 Bytes)
 
-
-## Establishing a connection
-### About TCP/BLE messages
-* Following specifications describe both ways of communication.
-* TCP / BLE messages consist of Line-Feed (`\n`) terminated UTF-8 Character Strings. (Null termination before HMAC)
-* Every TCP/BLE message is key-value based in form of: `key1="value1";key2="value2";` for every type of value. No key may be used more than once in a single message.
-* Only error messages do not come as key-value based messages.
-* Values containing a `"` character are prohibited and lead to the message being rejected.
-* Every Message has to have the 32 bytes of the HMAC (using sha256) appended in raw binary form. The HMAC is generated from the entire message, excluding only the HMAC itself. If the HMAC is wrong, "WRONG_HMAC" will be returned. This is optional, when debug mode is enabled.
-* Rejected messages will be fully ignored, unless a specific error message is returned.
-* Further rules regarding the messages must be extracted from the following section.
+### About USB Serial Data
+*Placeholder for future use with RAAM-MD*
 
 
 ## About Keys and Actions
@@ -57,7 +58,7 @@ The QR Code contains these information in this exact order.
 ### Overview of all possible keys
 Key | Description
 --- | -----------
-`t` | "t" for "time". Must always be sent, except for devices in debug mode. The current unix timestamp in seconds. This is used to ensure "freshness" of the data being integrity checked with the hmac. If the received timestamp differs from the local timestamp by more than 30 seconds, "INVALID_TIMESTAMP" will be returned and the connection closed. Applications must keep track of the last sent timestamp and check, that no message with an earlier timestamp is allowed. Messages with earlier timestamps will be ignored.
+`t` | "t" for "time". Must always be sent, except for clients in debug mode. The current unix timestamp in seconds. This is used to ensure "freshness" of the data being integrity checked with the hmac. If the received timestamp differs from the local timestamp by more than 30 seconds, "INVALID_TIMESTAMP" will be returned and the connection closed. Applications must keep track of the last sent timestamp and check, that no message with an earlier timestamp is allowed. Messages with earlier timestamps will be ignored.
 `a` | "a" for "action". Must always be sent. Possible values see above.
 `c` | "c" for "client". Must be Client ID as provided by the server upon pairing. If the client is unknown to the server, "CLIENT_UNKNOWN" will be returned and the connection closed. If the client is disabled or the user rejected a pairing request, "CLIENT_DISABLED" will be returned and the connection closed.
 `s` | "s" for "server id". If the server is unknown to the client, "SERVER_UNKNOWN" will be returned and the connection closed.
@@ -65,13 +66,13 @@ Key | Description
 `sv` | "sv" for "specs version". The version of this document.
 `v` | "v" for "version". Is the RAAM software version as semver string of the sender.
 `di` | "di" for "device id".
-`dc` | "dc" for "device configuration". Can be either "i" (for input like microphone) or "o" (for output like speaker). Has a "d" appended, if it is the default device for that role. Has an "u" appended, if it is unplugged, otherwise has an "a" appended, if is active. This value is just "0", when the device was removed or not found.
-`ddl` | "ddl" for "device description long".
-`dds` | "dds" for "device description short".
+`dc` | "dc" for "device configuration". Value may be empty. Can be either "i" (for input like microphone) or "o" (for output like speaker). Has a "d" appended, if it is the default device for that role. Has an "u" appended, if it is unplugged, otherwise has an "a" appended, if is active. This value is just "0", when the device was removed or not found.
+`ddl` | "ddl" for "device description long". Value may be empty.
+`dds` | "dds" for "device description short". Value may be empty.
 `dff` | "dff" for "device form factor". Is one of these values: "RemoteNetworkDevice", "Speakers", "LineLevel", "Headphones", "Microphone", "Headset", "Handset", "UnknownDigitalPassthrough", "SPDIF", "DigitalAudioDisplayDevice", "UnknownFormFactor".
 `si` | "si" for "session id".
-`sc` | "sc" for "session configuration". Value contains "s", if this session is a system sound session. Value contains This value ist just "0", when the session was removed or not found.
-`sdn` | "sdn" for "session display name".
+`sc` | "sc" for "session configuration". Value may be empty. Value contains "s", if this session is a system sound session. Value contains This value ist just "0", when the session was removed or not found.
+`sdn` | "sdn" for "session display name". Value may be empty.
 `sic` | "sic" for "session icon". This is the base64 representation of the image in "PNG" format. This value is just empty, when no icon was provided.
 `m` | "m" for "mute". Can be either `t` for true or `f` for false.
 `l` | "l" for "soundlevel". Any value for the volume between 0 and 100.
