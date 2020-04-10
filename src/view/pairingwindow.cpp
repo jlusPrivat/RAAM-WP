@@ -4,7 +4,7 @@
 
 PairingWindow::PairingWindow(QWidget *parent)
     : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint |
-              Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint) {
+              Qt::WindowCloseButtonHint) {
     // configure the window
     setModal(false);
     setAttribute(Qt::WA_DeleteOnClose, true);
